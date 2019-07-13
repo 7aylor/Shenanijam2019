@@ -29,6 +29,8 @@ namespace Shenanijam2019
         #endregion
 
         #region Textures
+        private Texture2D _pixel;
+
         //Player-Robot
         Texture2D playerMoveForward;
         Texture2D playerMoveBack;
@@ -71,18 +73,18 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie");
+            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie", 20, 20, 4, 10);
 
             npcs = new List<Character>();
             gameObjects = new List<GameObject>();
 
-            tsaMale = new Character(75, 1050, 5, SPRITE_SCALE, "Mike");
-            tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan");
-            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble");
-            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle");
-            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle");
-            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.");
-            wrench = new GameObject(575, 575, 5, SPRITE_SCALE, "wrench");
+            tsaMale = new Character(75, 1050, 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
+            tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
+            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble", 26, 26, 3);
+            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle", 26, 26, 3);
+            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle", 26, 26, 3);
+            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.", 32, 32, 5, 5);
+            wrench = new GameObject(575, 575, 5, SPRITE_SCALE, "wrench", 13, 24, 10, 4);
 
             npcs.Add(tsaMale);
             npcs.Add(tsaFemale);
@@ -104,6 +106,10 @@ namespace Shenanijam2019
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            //set up debug pixel
+            _pixel = new Texture2D(GraphicsDevice, 1, 1);
+            _pixel.SetData<Color>(new Color[] { Color.White });
 
             #region LoadTextures
 
@@ -196,7 +202,7 @@ namespace Shenanijam2019
                 g.Update();
             }
 
-            player.Update(camera, deltaTime);
+            player.Update(camera, deltaTime, npcs, gameObjects);
 
             base.Update(gameTime);
         }
@@ -214,16 +220,16 @@ namespace Shenanijam2019
             spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
             spriteBatch.End();
 
-            player.Draw(spriteBatch, camera);
+            player.Draw(spriteBatch, camera, _pixel);
             
             foreach(Character c in npcs)
             {
-                c.Draw(spriteBatch, camera);
+                c.Draw(spriteBatch, camera, _pixel);
             }
 
             foreach (GameObject g in gameObjects)
             {
-                g.Draw(spriteBatch, camera);
+                g.Draw(spriteBatch, camera, _pixel);
             }
 
             base.Draw(gameTime);

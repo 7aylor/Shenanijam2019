@@ -28,30 +28,46 @@ namespace Shenanijam2019
         public Animation currAnim;
         public SpriteEffects spriteEffects;
         public Direction direction { get; set; }
+        public BoundingBox boundingBox { get; set; }
+        internal int bXOffset;
+        internal int bYOffset;
         internal int _idleTime;
         internal int _maxIdleTime;
 
-        public GameObject(int x, int y, int speed, float Scale, string name)
+        public GameObject(int x, int y, int speed, float scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0)
         {
             this.X = x;
             this.Y = y;
             this.Speed = speed;
-            this.Scale = Scale;
+            this.Scale = scale;
             this.Name = name;
             this.Animations = new Dictionary<string, Animation>();
             direction = Direction.Right;
             spriteEffects = SpriteEffects.None;
+            this.bXOffset = (int)(bXOffset * scale);
+            this.bYOffset = (int)(bYOffset * scale);
+            this.boundingBox = new BoundingBox(new Vector2(this.X + this.bXOffset, this.Y - this.bYOffset) * Scale, bWidth * this.Scale, bHeight * this.Scale);
             _idleTime = 0;
             _maxIdleTime = 180;
         }
 
         public virtual void Update()
         {
+            UpdateBoundingPositions();
             currAnim.Update();
         }
 
-        public void Draw(SpriteBatch sb, Camera camera)
+        public void UpdateBoundingPositions()
         {
+            boundingBox.Position = new Vector2(this.X + bXOffset, this.Y - boundingBox.Height - bYOffset);
+        }
+
+        public void Draw(SpriteBatch sb, Camera camera, Texture2D pixel)
+        {
+            sb.Begin(transformMatrix: camera.TransformationMatrix);
+            sb.Draw(pixel, this.boundingBox.Bounds, Color.Red);
+            sb.End();
+
             currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects, camera);
         }
 
@@ -77,7 +93,7 @@ namespace Shenanijam2019
 
     public class Character : GameObject
     {
-        public Character(int x, int y, int speed, float Scale, string name) : base(x, y, speed, Scale, name)
+        public Character(int x, int y, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0) : base(x, y, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
         }
     }
@@ -86,12 +102,12 @@ namespace Shenanijam2019
     {
         internal KeyboardState _prevKbs;
 
-        public Player(int x, int y, int speed, float Scale, string name) : base(x, y, speed, Scale, name)
+        public Player(int x, int y, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(x, y, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
             _prevKbs = Keyboard.GetState();
         }
 
-        public void Update(Camera camera, float dt)
+        public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects)
         {
             KeyboardState kbs = Keyboard.GetState();
             spriteEffects = SpriteEffects.None;
@@ -147,8 +163,6 @@ namespace Shenanijam2019
 
             if (kbs.GetPressedKeys().Length == 0)
             {
-                Debug.WriteLine("No keys pressed");
-
                 SetCurrentAnimation("idle_side");
                 if(direction == Direction.Left)
                 {
@@ -172,8 +186,7 @@ namespace Shenanijam2019
             _prevKbs = kbs;
             camera.X = this.X - (1240 / 2) + 16;
             camera.Y = this.Y - (720 / 2);
-            Debug.WriteLine("x: " + camera.X);
-            Debug.WriteLine("y: " + camera.Y);
+            UpdateBoundingPositions();
             currAnim.Update();
         }
     }
