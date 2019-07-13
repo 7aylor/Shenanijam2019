@@ -1,0 +1,67 @@
+{ "frames": {
+   "player_forward 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   },
+   "player_forward 1.aseprite": {
+    "frame": { "x": 32, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   },
+   "player_forward 2.aseprite": {
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   },
+   "player_forward 3.aseprite": {
+    "frame": { "x": 96, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   },
+   "player_forward 4.aseprite": {
+    "frame": { "x": 128, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   },
+   "player_forward 5.aseprite": {
+    "frame": { "x": 160, "y": 0, "w": 32, "h": 33 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 33 },
+    "sourceSize": { "w": 32, "h": 33 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.13-x64",
+  "image": "player_forward.png",
+  "format": "RGBA8888",
+  "size": { "w": 192, "h": 33 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+   { "name": "forward_collision", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 4, "y": 1, "w": 23, "h": 32 } }, { "frame": 1, "bounds": {"x": 4, "y": 0, "w": 23, "h": 33 } }, { "frame": 2, "bounds": {"x": 4, "y": 1, "w": 23, "h": 32 } }] }
+  ]
+ }
+}
