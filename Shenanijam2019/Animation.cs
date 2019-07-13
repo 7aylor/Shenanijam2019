@@ -16,20 +16,22 @@ namespace Shenanijam2019
         public int speed { get; set; }
         public int LoopFrame { get; set; }
         public Texture2D spriteSheet { get; set; }
+        public Vector2 SpriteOrigin { get; set; }
 
         private int _currFrame;
         private int _tickCount;
 
-        public Animation(int totalFrames, int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrame = -1)
+        public Animation(int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrame = -1)
         {
             _currFrame = 0;
-            this.TotalFrames = totalFrames;
             this.SpriteWidth = spriteWidth;
             this.SpriteHeight = spriteHeight;
             this.speed = speed;
             this.spriteSheet = spriteSheet;
             this.LoopFrame = loopFrame;
+            this.TotalFrames = (spriteSheet.Width / SpriteWidth) - 1;
             _tickCount = 0;
+            SpriteOrigin = new Vector2(0, SpriteHeight);
         }
 
         /// <summary>
@@ -64,8 +66,18 @@ namespace Shenanijam2019
             Rectangle destination = new Rectangle((int)position.X, (int)position.Y, (int)(SpriteWidth * scale), (int)(SpriteHeight * scale));
 
             sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
-            sb.Draw(spriteSheet, destination, source, Color.White, 0, Vector2.Zero, spriteEffects, 1);
+            sb.Draw(spriteSheet, destination, source, Color.White, 0, SpriteOrigin, spriteEffects, 1);
             sb.End();
+        }
+
+        public void ResetFrames()
+        {
+            _currFrame = 0;
+        }
+        
+        public bool IsComplete()
+        {
+            return (_currFrame == TotalFrames) ? true : false;
         }
     }
 }

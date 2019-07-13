@@ -18,12 +18,16 @@ namespace Shenanijam2019
         Texture2D playerMoveForward;
         Texture2D playerMoveBack;
         Texture2D playerMoveSide;
+        Texture2D playerIdleSide;
+        Texture2D playerIdleLongSide;
 
         #endregion
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             Content.RootDirectory = "Content";
         }
 
@@ -36,7 +40,7 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(100, 100, 3, 3,"Ralphie");
+            player = new Player(100, 100, 5, 3,"Ralphie");
             base.Initialize();
         }
 
@@ -53,13 +57,17 @@ namespace Shenanijam2019
             playerMoveForward = Content.Load<Texture2D>("player_move_forward");
             playerMoveBack = Content.Load<Texture2D>("player_move_back");
             playerMoveSide = Content.Load<Texture2D>("player_move_side");
+            playerIdleSide = Content.Load<Texture2D>("player_idle_side");
+            playerIdleLongSide = Content.Load<Texture2D>("player_idlelong_side");
 
 
-            player.AddAnimation("move_forward", new Animation(5, 32, 33, 8, playerMoveForward));
-            player.AddAnimation("move_back", new Animation(5, 32, 33, 8, playerMoveBack));
-            player.AddAnimation("move_side", new Animation(5, 32, 33, 8, playerMoveSide, 4));
+            player.AddAnimation("move_forward", new Animation(32, 33, 8, playerMoveForward));
+            player.AddAnimation("move_back", new Animation(32, 33, 8, playerMoveBack));
+            player.AddAnimation("move_side", new Animation(32, 33, 8, playerMoveSide, 4));
+            player.AddAnimation("idle_side", new Animation(32, 33, 8, playerIdleSide));
+            player.AddAnimation("idlelong_side", new Animation(31, 42, 8, playerIdleLongSide));
 
-            player.SetCurrentAnimation("move_side");
+            player.SetCurrentAnimation("idlelong_side");
 
             // TODO: use this.Content to load your game content here
         }
