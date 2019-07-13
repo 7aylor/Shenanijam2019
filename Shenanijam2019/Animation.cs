@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Shenanijam2019
 {
-    class Animation
+    public class Animation
     {
         public int TotalFrames { get; set; }
         public int SpriteWidth { get; set; }
@@ -49,7 +49,7 @@ namespace Shenanijam2019
                 }
                 else
                 {
-                    //goes back to 0 unless there is a loop frame set
+                    //goes back to 0 unless there is a loop frame set - TERNARY PROOF FOR GGG
                     _currFrame = (LoopFrame != -1 && _currFrame >= LoopFrame) ? LoopFrame : 0;
                 }
             }

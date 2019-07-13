@@ -12,14 +12,38 @@ namespace Shenanijam2019
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        const int SPRITE_SCALE = 3;
+
+        #region Characters
         Player player;
+        List<Character> npcs;
+        List<GameObject> gameObjects;
+        Character tsaMale;
+        Character tsaFemale;
+        Character greenGorblork;
+        Character orangeGorblork;
+        Character purpleGorblork;
+        GameObject wrench;
+        #endregion
 
         #region Textures
+        //Player-Robot
         Texture2D playerMoveForward;
         Texture2D playerMoveBack;
         Texture2D playerMoveSide;
         Texture2D playerIdleSide;
-        Texture2D playerIdleLongSide;
+        Texture2D playerIdleLongRight;
+        Texture2D playerIdleLongLeft;
+
+        //NPCs
+        Texture2D tsaMaleIdle;
+        Texture2D tsaFemaleIdle;
+        Texture2D greenGorblorkIdle;
+        Texture2D orangeGorblorkIdle;
+        Texture2D purpleGorblorkIdle;
+
+        //GameObjects
+        Texture2D wrenchSpin;
 
         #endregion
 
@@ -40,7 +64,26 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(100, 100, 5, 3,"Ralphie");
+            player = new Player(100, 100, 5, SPRITE_SCALE, "Ralphie");
+
+            npcs = new List<Character>();
+            gameObjects = new List<GameObject>();
+
+            tsaMale = new Character(200, 400, 5, SPRITE_SCALE, "Mike");
+            tsaFemale = new Character(300, 700, 5, SPRITE_SCALE, "Megan");
+            greenGorblork = new Character(700, 700, 5, SPRITE_SCALE, "Garble");
+            orangeGorblork = new Character(900, 400, 5, SPRITE_SCALE, "Gurgle");
+            purpleGorblork = new Character(500, 500, 5, SPRITE_SCALE, "Grundle");
+            wrench = new GameObject(100, 100, 5, SPRITE_SCALE, "wrench");
+
+            npcs.Add(tsaMale);
+            npcs.Add(tsaFemale);
+            npcs.Add(greenGorblork);
+            npcs.Add(orangeGorblork);
+            npcs.Add(purpleGorblork);
+
+            gameObjects.Add(wrench);
+
             base.Initialize();
         }
 
@@ -53,22 +96,57 @@ namespace Shenanijam2019
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //Textures
+            #region LoadTextures
+
+            //player-robot
             playerMoveForward = Content.Load<Texture2D>("player_move_forward");
             playerMoveBack = Content.Load<Texture2D>("player_move_back");
             playerMoveSide = Content.Load<Texture2D>("player_move_side");
             playerIdleSide = Content.Load<Texture2D>("player_idle_side");
-            playerIdleLongSide = Content.Load<Texture2D>("player_idlelong_side");
+            playerIdleLongRight = Content.Load<Texture2D>("player_idlelong_right");
+            playerIdleLongLeft = Content.Load<Texture2D>("player_idlelong_left");
 
 
+            //NPCs
+            tsaMaleIdle = Content.Load<Texture2D>("tsa_male_idle");
+            tsaFemaleIdle = Content.Load<Texture2D>("tsa_female_idle");
+            greenGorblorkIdle = Content.Load<Texture2D>("green_gorblork_idle");
+            orangeGorblorkIdle = Content.Load<Texture2D>("orange_gorblork_idle");
+            purpleGorblorkIdle = Content.Load<Texture2D>("purple_gorblork_idle");
+            #endregion
+
+            //GameObjects
+            wrenchSpin = Content.Load<Texture2D>("wrench");
+
+            #region add animations
+            //player-robot
             player.AddAnimation("move_forward", new Animation(32, 33, 8, playerMoveForward));
             player.AddAnimation("move_back", new Animation(32, 33, 8, playerMoveBack));
-            player.AddAnimation("move_side", new Animation(32, 33, 8, playerMoveSide, 4));
+            player.AddAnimation("move_side", new Animation(32, 32, 8, playerMoveSide, 4));
             player.AddAnimation("idle_side", new Animation(32, 33, 8, playerIdleSide));
-            player.AddAnimation("idlelong_side", new Animation(31, 42, 8, playerIdleLongSide));
-
+            player.AddAnimation("idlelong_right", new Animation(31, 42, 8, playerIdleLongRight, 3));
+            player.AddAnimation("idlelong_left", new Animation(31, 42, 8, playerIdleLongLeft, 3));
             player.SetCurrentAnimation("idlelong_side");
 
+            //NPCs
+            tsaMale.AddAnimation("idle_side", new Animation(32, 32, 8, tsaMaleIdle));
+            tsaMale.SetCurrentAnimation("idle_side");
+
+            tsaFemale.AddAnimation("idle_side", new Animation(32, 32, 8, tsaFemaleIdle));
+            tsaFemale.SetCurrentAnimation("idle_side");
+            greenGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, greenGorblorkIdle));
+            greenGorblork.SetCurrentAnimation("idle_side");
+            orangeGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, orangeGorblorkIdle));
+            orangeGorblork.SetCurrentAnimation("idle_side");
+            purpleGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, purpleGorblorkIdle));
+            purpleGorblork.SetCurrentAnimation("idle_side");
+            purpleGorblork.SetCurrentAnimation("idle_side");
+
+            //GameObjects
+            wrench.AddAnimation("spin", new Animation(32, 32, 8, wrenchSpin));
+            wrench.SetCurrentAnimation("spin");
+            
+            #endregion
             // TODO: use this.Content to load your game content here
         }
 
@@ -91,7 +169,17 @@ namespace Shenanijam2019
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+
+            foreach(Character c in npcs)
+            {
+                c.Update();
+            }
+
+            foreach(GameObject g in gameObjects)
+            {
+                g.Update();
+            }
+
             player.Update();
 
             base.Update(gameTime);
@@ -110,6 +198,16 @@ namespace Shenanijam2019
             spriteBatch.End();
 
             player.Draw(spriteBatch);
+            
+            foreach(Character c in npcs)
+            {
+                c.Draw(spriteBatch);
+            }
+
+            foreach (GameObject g in gameObjects)
+            {
+                g.Draw(spriteBatch);
+            }
 
             base.Draw(gameTime);
         }
