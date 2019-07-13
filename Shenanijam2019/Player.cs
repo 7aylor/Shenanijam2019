@@ -19,8 +19,8 @@ namespace Shenanijam2019
 
     public class GameObject
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
         public int Speed { get; set; }
         public float Scale { get; set; }
         public string Name { get; set; }
@@ -50,9 +50,9 @@ namespace Shenanijam2019
             currAnim.Update();
         }
 
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, Camera camera)
         {
-            currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects);
+            currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects, camera);
         }
 
         /// <summary>
@@ -77,9 +77,6 @@ namespace Shenanijam2019
 
     public class Character : GameObject
     {
-
-
-
         public Character(int x, int y, int speed, float Scale, string name) : base(x, y, speed, Scale, name)
         {
         }
@@ -94,15 +91,22 @@ namespace Shenanijam2019
             _prevKbs = Keyboard.GetState();
         }
 
-        public override void Update()
+        public void Update(Camera camera, float dt)
         {
             KeyboardState kbs = Keyboard.GetState();
             spriteEffects = SpriteEffects.None;
+            float speedModifier = 1;
+
+            //handles diagonals
+            if (kbs.GetPressedKeys().Length == 2)
+            {
+                speedModifier *= 0.707f;
+            }
 
             //up
             if (kbs.IsKeyDown(Keys.W))
             {
-                Y -= Speed;
+                Y -= Speed * dt * speedModifier;
                 _idleTime = 0;
                 direction = Direction.Up;
                 SetCurrentAnimation("move_back");
@@ -110,7 +114,7 @@ namespace Shenanijam2019
             //down
             if (kbs.IsKeyDown(Keys.S))
             {
-                Y += Speed;
+                Y += Speed * dt * speedModifier;
                 _idleTime = 0;
                 direction = Direction.Down;
                 SetCurrentAnimation("move_forward");
@@ -118,7 +122,7 @@ namespace Shenanijam2019
             //left
             if (kbs.IsKeyDown(Keys.A))
             {
-                X -= Speed;
+                X -= Speed * dt * speedModifier;
                 _idleTime = 0;
                 SetCurrentAnimation("move_side");
                 spriteEffects = SpriteEffects.FlipHorizontally;
@@ -131,7 +135,7 @@ namespace Shenanijam2019
             //right
             if (kbs.IsKeyDown(Keys.D))
             {
-                X += Speed;
+                X += Speed * dt * speedModifier;
                 _idleTime = 0;
                 SetCurrentAnimation("move_side");
                 direction = Direction.Right;
@@ -140,6 +144,7 @@ namespace Shenanijam2019
                     currAnim.ResetFrames();
                 }
             }
+
             if (kbs.GetPressedKeys().Length == 0)
             {
                 Debug.WriteLine("No keys pressed");
@@ -165,6 +170,10 @@ namespace Shenanijam2019
             }
 
             _prevKbs = kbs;
+            camera.X = this.X - (1240 / 2) + 16;
+            camera.Y = this.Y - (720 / 2);
+            Debug.WriteLine("x: " + camera.X);
+            Debug.WriteLine("y: " + camera.Y);
             currAnim.Update();
         }
     }

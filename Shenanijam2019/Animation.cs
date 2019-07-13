@@ -65,7 +65,25 @@ namespace Shenanijam2019
             Rectangle source = new Rectangle(_currFrame * SpriteWidth, 0, SpriteWidth, SpriteHeight);
             Rectangle destination = new Rectangle((int)position.X, (int)position.Y, (int)(SpriteWidth * scale), (int)(SpriteHeight * scale));
 
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            sb.Draw(spriteSheet, destination, source, Color.White, 0, SpriteOrigin, spriteEffects, 1);
+            sb.End();
+        }
+
+        /// <summary>
+        /// draw the sprite, considering size
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="position"></param>
+        public void Draw(SpriteBatch sb, Vector2 position, float scale, SpriteEffects spriteEffects, Camera camera)
+        {
+            Rectangle source = new Rectangle(_currFrame * SpriteWidth, 0, SpriteWidth, SpriteHeight);
+            Rectangle destination = new Rectangle((int)position.X, (int)position.Y, (int)(SpriteWidth * scale), (int)(SpriteHeight * scale));
+
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, 
+                DepthStencilState.None, RasterizerState.CullCounterClockwise, 
+                transformMatrix: camera.TransformationMatrix);
             sb.Draw(spriteSheet, destination, source, Color.White, 0, SpriteOrigin, spriteEffects, 1);
             sb.End();
         }

@@ -25,6 +25,30 @@
 /processorParam:TextureFormat=Color
 /build:../../Art/green_gorblork_idle.png;green_gorblork_idle.png
 
+#begin ../../Art/loosely_related_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/loosely_related_idle.png;loosely_related_idle.png
+
+#begin ../../Art/main.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/main.png;main.png
+
 #begin ../../Art/orange_gorblork_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor

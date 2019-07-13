@@ -13,6 +13,7 @@ namespace Shenanijam2019
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         const int SPRITE_SCALE = 3;
+        Camera camera;
 
         #region Characters
         Player player;
@@ -23,6 +24,7 @@ namespace Shenanijam2019
         Character greenGorblork;
         Character orangeGorblork;
         Character purpleGorblork;
+        Character looselyRelatedRobot;
         GameObject wrench;
         #endregion
 
@@ -41,10 +43,13 @@ namespace Shenanijam2019
         Texture2D greenGorblorkIdle;
         Texture2D orangeGorblorkIdle;
         Texture2D purpleGorblorkIdle;
+        Texture2D looselyRelatedIdle;
 
         //GameObjects
         Texture2D wrenchSpin;
 
+        //Environment
+        Texture2D main;
         #endregion
 
         public Game1()
@@ -52,6 +57,8 @@ namespace Shenanijam2019
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+            camera = new Camera(1280, 720);
+            this.Window.Title = "Excuse me, but you can't park here...";
             Content.RootDirectory = "Content";
         }
 
@@ -64,23 +71,25 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(100, 100, 5, SPRITE_SCALE, "Ralphie");
+            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie");
 
             npcs = new List<Character>();
             gameObjects = new List<GameObject>();
 
-            tsaMale = new Character(200, 400, 5, SPRITE_SCALE, "Mike");
-            tsaFemale = new Character(300, 700, 5, SPRITE_SCALE, "Megan");
-            greenGorblork = new Character(700, 700, 5, SPRITE_SCALE, "Garble");
-            orangeGorblork = new Character(900, 400, 5, SPRITE_SCALE, "Gurgle");
-            purpleGorblork = new Character(500, 500, 5, SPRITE_SCALE, "Grundle");
-            wrench = new GameObject(100, 100, 5, SPRITE_SCALE, "wrench");
+            tsaMale = new Character(75, 1050, 5, SPRITE_SCALE, "Mike");
+            tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan");
+            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble");
+            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle");
+            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle");
+            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.");
+            wrench = new GameObject(575, 575, 5, SPRITE_SCALE, "wrench");
 
             npcs.Add(tsaMale);
             npcs.Add(tsaFemale);
             npcs.Add(greenGorblork);
             npcs.Add(orangeGorblork);
             npcs.Add(purpleGorblork);
+            npcs.Add(looselyRelatedRobot);
 
             gameObjects.Add(wrench);
 
@@ -113,15 +122,19 @@ namespace Shenanijam2019
             greenGorblorkIdle = Content.Load<Texture2D>("green_gorblork_idle");
             orangeGorblorkIdle = Content.Load<Texture2D>("orange_gorblork_idle");
             purpleGorblorkIdle = Content.Load<Texture2D>("purple_gorblork_idle");
+            looselyRelatedIdle = Content.Load<Texture2D>("loosely_related_idle");
             #endregion
 
             //GameObjects
             wrenchSpin = Content.Load<Texture2D>("wrench");
 
+            //Environment
+            main = Content.Load<Texture2D>("main");
+
             #region add animations
             //player-robot
-            player.AddAnimation("move_forward", new Animation(32, 33, 8, playerMoveForward));
-            player.AddAnimation("move_back", new Animation(32, 33, 8, playerMoveBack));
+            player.AddAnimation("move_forward", new Animation(32, 33, 8, playerMoveForward, 4));
+            player.AddAnimation("move_back", new Animation(32, 33, 8, playerMoveBack, 4));
             player.AddAnimation("move_side", new Animation(32, 32, 8, playerMoveSide, 4));
             player.AddAnimation("idle_side", new Animation(32, 33, 8, playerIdleSide));
             player.AddAnimation("idlelong_right", new Animation(31, 42, 8, playerIdleLongRight, 3));
@@ -131,16 +144,18 @@ namespace Shenanijam2019
             //NPCs
             tsaMale.AddAnimation("idle_side", new Animation(32, 32, 8, tsaMaleIdle));
             tsaMale.SetCurrentAnimation("idle_side");
-
             tsaFemale.AddAnimation("idle_side", new Animation(32, 32, 8, tsaFemaleIdle));
             tsaFemale.SetCurrentAnimation("idle_side");
+
             greenGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, greenGorblorkIdle));
             greenGorblork.SetCurrentAnimation("idle_side");
             orangeGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, orangeGorblorkIdle));
             orangeGorblork.SetCurrentAnimation("idle_side");
             purpleGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, purpleGorblorkIdle));
             purpleGorblork.SetCurrentAnimation("idle_side");
-            purpleGorblork.SetCurrentAnimation("idle_side");
+
+            looselyRelatedRobot.AddAnimation("idle_side", new Animation(32, 32, 8, looselyRelatedIdle));
+            looselyRelatedRobot.SetCurrentAnimation("idle_side");
 
             //GameObjects
             wrench.AddAnimation("spin", new Animation(32, 32, 8, wrenchSpin));
@@ -169,8 +184,9 @@ namespace Shenanijam2019
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            foreach(Character c in npcs)
+            foreach (Character c in npcs)
             {
                 c.Update();
             }
@@ -180,7 +196,7 @@ namespace Shenanijam2019
                 g.Update();
             }
 
-            player.Update();
+            player.Update(camera, deltaTime);
 
             base.Update(gameTime);
         }
@@ -191,22 +207,23 @@ namespace Shenanijam2019
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(new Color(20 ,16, 19));
 
             // TODO: Add your drawing code here
-            spriteBatch.Begin();
+            spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
             spriteBatch.End();
 
-            player.Draw(spriteBatch);
+            player.Draw(spriteBatch, camera);
             
             foreach(Character c in npcs)
             {
-                c.Draw(spriteBatch);
+                c.Draw(spriteBatch, camera);
             }
 
             foreach (GameObject g in gameObjects)
             {
-                g.Draw(spriteBatch);
+                g.Draw(spriteBatch, camera);
             }
 
             base.Draw(gameTime);
