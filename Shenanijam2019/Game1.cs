@@ -73,17 +73,17 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie", 20, 20, 4, 10);
+            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie", 18, 20, 6, 4);
 
             npcs = new List<Character>();
             gameObjects = new List<GameObject>();
 
             tsaMale = new Character(75, 1050, 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
             tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
-            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble", 26, 26, 3);
-            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle", 26, 26, 3);
-            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle", 26, 26, 3);
-            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.", 32, 32, 5, 5);
+            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble", 16, 20, 6);
+            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle", 16, 20, 6);
+            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle", 16, 20, 6);
+            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
             wrench = new GameObject(575, 575, 5, SPRITE_SCALE, "wrench", 13, 24, 10, 4);
 
             npcs.Add(tsaMale);
@@ -220,7 +220,6 @@ namespace Shenanijam2019
             spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
             spriteBatch.End();
 
-            player.Draw(spriteBatch, camera, _pixel);
             
             foreach(Character c in npcs)
             {
@@ -231,6 +230,8 @@ namespace Shenanijam2019
             {
                 g.Draw(spriteBatch, camera, _pixel);
             }
+
+            player.Draw(spriteBatch, camera, _pixel);
 
             base.Draw(gameTime);
         }

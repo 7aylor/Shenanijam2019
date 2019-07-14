@@ -64,10 +64,11 @@ namespace Shenanijam2019
 
         public void Draw(SpriteBatch sb, Camera camera, Texture2D pixel)
         {
+            /*
             sb.Begin(transformMatrix: camera.TransformationMatrix);
             sb.Draw(pixel, this.boundingBox.Bounds, Color.Red);
             sb.End();
-
+            */
             currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects, camera);
         }
 
@@ -100,11 +101,13 @@ namespace Shenanijam2019
 
     public class Player : Character
     {
-        internal KeyboardState _prevKbs;
+        private KeyboardState _prevKbs;
+        private int _wrenches;
 
         public Player(int x, int y, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(x, y, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
             _prevKbs = Keyboard.GetState();
+            _wrenches = 0;
         }
 
         public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects)
@@ -112,6 +115,10 @@ namespace Shenanijam2019
             KeyboardState kbs = Keyboard.GetState();
             spriteEffects = SpriteEffects.None;
             float speedModifier = 1;
+
+            BoundingBox b = this.boundingBox;
+            GameObject wrench = null;
+
 
             //handles diagonals
             if (kbs.GetPressedKeys().Length == 2)
@@ -122,42 +129,74 @@ namespace Shenanijam2019
             //up
             if (kbs.IsKeyDown(Keys.W))
             {
-                Y -= Speed * dt * speedModifier;
                 _idleTime = 0;
-                direction = Direction.Up;
-                SetCurrentAnimation("move_back");
+
+                b.Position = new Vector2(this.boundingBox.Position.X, this.boundingBox.Position.Y - Speed * dt * speedModifier);
+
+                wrench = CheckWrenchCollisions(gameObjects, b);
+
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                {
+                    Y -= Speed * dt * speedModifier;
+                    direction = Direction.Up;
+                    SetCurrentAnimation("move_back");
+                }
             }
             //down
             if (kbs.IsKeyDown(Keys.S))
             {
-                Y += Speed * dt * speedModifier;
                 _idleTime = 0;
-                direction = Direction.Down;
-                SetCurrentAnimation("move_forward");
+
+                b.Position = new Vector2(this.boundingBox.Position.X, this.boundingBox.Position.Y + Speed * dt * speedModifier);
+
+                wrench = CheckWrenchCollisions(gameObjects, b);
+
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                {
+                    Y += Speed * dt * speedModifier;
+                    direction = Direction.Down;
+                    SetCurrentAnimation("move_forward");
+                }
             }
             //left
             if (kbs.IsKeyDown(Keys.A))
             {
-                X -= Speed * dt * speedModifier;
                 _idleTime = 0;
-                SetCurrentAnimation("move_side");
-                spriteEffects = SpriteEffects.FlipHorizontally;
-                direction = Direction.Left;
-                if (!_prevKbs.IsKeyDown(Keys.A))
+
+                b.Position = new Vector2(this.boundingBox.Position.X - Speed * dt * speedModifier, this.boundingBox.Position.Y);
+
+                wrench = CheckWrenchCollisions(gameObjects, b);
+
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
                 {
-                    currAnim.ResetFrames();
+                    X -= Speed * dt * speedModifier;
+                    SetCurrentAnimation("move_side");
+                    direction = Direction.Left;
+                    if (!_prevKbs.IsKeyDown(Keys.A))
+                    {
+                        currAnim.ResetFrames();
+                    }
                 }
+                spriteEffects = SpriteEffects.FlipHorizontally;
             }
             //right
             if (kbs.IsKeyDown(Keys.D))
             {
-                X += Speed * dt * speedModifier;
                 _idleTime = 0;
-                SetCurrentAnimation("move_side");
-                direction = Direction.Right;
-                if (!_prevKbs.IsKeyDown(Keys.D))
+
+                b.Position = new Vector2(this.boundingBox.Position.X + Speed * dt * speedModifier, this.boundingBox.Position.Y);
+
+                wrench = CheckWrenchCollisions(gameObjects, b);
+
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
                 {
-                    currAnim.ResetFrames();
+                    X += Speed * dt * speedModifier;
+                    SetCurrentAnimation("move_side");
+                    direction = Direction.Right;
+                    if (!_prevKbs.IsKeyDown(Keys.D))
+                    {
+                        currAnim.ResetFrames();
+                    }
                 }
             }
 
@@ -183,11 +222,52 @@ namespace Shenanijam2019
                 }
             }
 
+            if(wrench != null)
+            {
+                gameObjects.Remove(wrench);
+            }
+
             _prevKbs = kbs;
             camera.X = this.X - (1240 / 2) + 16;
             camera.Y = this.Y - (720 / 2);
             UpdateBoundingPositions();
             currAnim.Update();
+        }
+
+        public bool CheckCollisions(List<GameObject> list, BoundingBox b)
+        {
+            foreach(GameObject g in list)
+            {
+                if(b.CollisionCheck(g.boundingBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CheckCollisions(List<Character> list, BoundingBox b)
+        {
+            foreach (Character c in list)
+            {
+                if (b.CollisionCheck(c.boundingBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public GameObject CheckWrenchCollisions(List<GameObject> list, BoundingBox b)
+        {
+            foreach (GameObject g in list)
+            {
+                if (b.CollisionCheck(g.boundingBox) && g.Name == "wrench")
+                {
+                    return g;
+                }
+            }
+            return null;
         }
     }
 }
