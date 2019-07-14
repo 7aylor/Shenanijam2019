@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\packages\MonoGame.Extended.Content.Pipeline.1.1.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -133,6 +134,11 @@
 /processorParam:TextureFormat=Color
 /build:../../Art/purple_gorblork_idle.png;purple_gorblork_idle.png
 
+#begin ../../Art/spaceport.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:../../Art/spaceport.tmx;spaceport.tmx
+
 #begin ../../Art/tsa_female_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -156,6 +162,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/tsa_male_idle.png;tsa_male_idle.png
+
+#begin ../../Art/walls_sprite.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/walls_sprite.png;walls_sprite.png
 
 #begin ../../Art/wrench.png
 /importer:TextureImporter

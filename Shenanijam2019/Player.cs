@@ -64,11 +64,11 @@ namespace Shenanijam2019
 
         public void Draw(SpriteBatch sb, Camera camera, Texture2D pixel)
         {
-            /*
+
             sb.Begin(transformMatrix: camera.TransformationMatrix);
             sb.Draw(pixel, this.boundingBox.Bounds, Color.Red);
             sb.End();
-            */
+
             currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects, camera);
         }
 
@@ -225,11 +225,12 @@ namespace Shenanijam2019
             if(wrench != null)
             {
                 gameObjects.Remove(wrench);
+                _wrenches += 10;
             }
 
             _prevKbs = kbs;
-            camera.X = this.X - (1240 / 2) + 16;
-            camera.Y = this.Y - (720 / 2);
+            camera.X = this.X - (1240 / 6) + 16;
+            camera.Y = this.Y - (720 / 6);
             UpdateBoundingPositions();
             currAnim.Update();
         }

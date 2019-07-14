@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Graphics;
 
 namespace Shenanijam2019
 {
@@ -12,8 +14,10 @@ namespace Shenanijam2019
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        const int SPRITE_SCALE = 3;
+        const int SPRITE_SCALE = 1;
         Camera camera;
+        TiledMapRenderer mapRender;
+        TiledMap map;
 
         #region Characters
         Player player;
@@ -73,12 +77,15 @@ namespace Shenanijam2019
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            player = new Player(800, 600, 400, SPRITE_SCALE, "Ralphie", 18, 20, 6, 4);
+            mapRender = new TiledMapRenderer(GraphicsDevice);
+
+            player = new Player(900, 900, 150, SPRITE_SCALE, "Ralphie", 18, 20, 6, 4);
+            camera.Zoom = new Vector2(3, 3);
 
             npcs = new List<Character>();
             gameObjects = new List<GameObject>();
 
-            tsaMale = new Character(75, 1050, 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
+            tsaMale = new Character(750, 1050, 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
             tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
             greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble", 16, 20, 6);
             orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle", 16, 20, 6);
@@ -110,6 +117,8 @@ namespace Shenanijam2019
             //set up debug pixel
             _pixel = new Texture2D(GraphicsDevice, 1, 1);
             _pixel.SetData<Color>(new Color[] { Color.White });
+
+            map = Content.Load<TiledMap>("spaceport");
 
             #region LoadTextures
 
@@ -217,8 +226,12 @@ namespace Shenanijam2019
 
             // TODO: Add your drawing code here
             spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
+            spriteBatch.Draw(main, new Vector2(512, 512), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
             spriteBatch.End();
+
+            Matrix projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width / SPRITE_SCALE, GraphicsDevice.Viewport.Height / SPRITE_SCALE, 0, 0, -1);
+
+            mapRender.Draw(map, camera.TransformationMatrix, projection);
 
             
             foreach(Character c in npcs)
@@ -232,6 +245,10 @@ namespace Shenanijam2019
             }
 
             player.Draw(spriteBatch, camera, _pixel);
+
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0,0,32,32), Color.White, 0, Vector2.Zero, SPRITE_SCALE, SpriteEffects.None, 0);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
