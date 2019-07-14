@@ -225,9 +225,9 @@ namespace Shenanijam2019
             GraphicsDevice.Clear(new Color(20 ,16, 19));
 
             // TODO: Add your drawing code here
-            spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(main, new Vector2(512, 512), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
-            spriteBatch.End();
+            //spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
+            //spriteBatch.Draw(main, new Vector2(512, 512), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
+            //spriteBatch.End();
 
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width / SPRITE_SCALE, GraphicsDevice.Viewport.Height / SPRITE_SCALE, 0, 0, -1);
 

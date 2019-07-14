@@ -86,6 +86,18 @@
 /processorParam:TextureFormat=Color
 /build:../../Art/player_idlelong_left.png;player_idlelong_left.png
 
+#begin ../../Art/player_idlelong_right.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/player_idlelong_right.png;player_idlelong_right.png
+
 #begin ../../Art/player_move_back.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -139,6 +151,18 @@
 /processor:TiledMapProcessor
 /build:../../Art/spaceport.tmx;spaceport.tmx
 
+#begin ../../Art/ticket_booth.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/ticket_booth.png;ticket_booth.png
+
 #begin ../../Art/tsa_female_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -186,16 +210,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/wrench.png;wrench.png
-
-#begin player_longidle_side.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:player_longidle_side.png;player_idlelong_right.png
 
