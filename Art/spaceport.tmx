@@ -121,7 +121,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="4" name="Walls">
+ <objectgroup id="4" name="Walls_objs">
   <object id="8" name="MiddleTopLeftWall" x="0" y="512" width="1056" height="32"/>
   <object id="10" name="MiddleBottomLeftWall" x="0" y="1152" width="1056" height="32"/>
   <object id="12" name="MiddleTopRightWall" x="1088" y="512" width="1056" height="32"/>
@@ -139,7 +139,7 @@
   <object id="25" name="LeftWall" x="0" y="544" width="32" height="608"/>
   <object id="27" name="RightWall" x="2112" y="544" width="32" height="608"/>
  </objectgroup>
- <objectgroup id="9" name="Buildings">
+ <objectgroup id="9" name="Buildings_objs">
   <object id="36" name="TicketBoothMiddle" x="675" y="632" width="186" height="41"/>
   <object id="37" name="TicketBoothTop" x="672" y="512" width="192" height="120"/>
   <object id="38" name="TicketBoothRightPillar" x="835" y="672" width="26" height="20"/>

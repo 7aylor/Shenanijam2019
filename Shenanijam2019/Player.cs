@@ -19,34 +19,32 @@ namespace Shenanijam2019
 
     public class GameObject
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public Vector2 Position { get; set; }
         public int Speed { get; set; }
         public float Scale { get; set; }
         public string Name { get; set; }
         public Dictionary<string, Animation> Animations;
         public Animation currAnim;
         public SpriteEffects spriteEffects;
-        public Direction direction { get; set; }
-        public BoundingBox boundingBox { get; set; }
+        public Direction Direction { get; set; }
+        public BoundingBox BoundingBox { get; set; }
         internal int bXOffset;
         internal int bYOffset;
         internal int _idleTime;
         internal int _maxIdleTime;
 
-        public GameObject(int x, int y, int speed, float scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0)
+        public GameObject(Vector2 position, int speed, float scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0)
         {
-            this.X = x;
-            this.Y = y;
+            this.Position = position;
             this.Speed = speed;
             this.Scale = scale;
             this.Name = name;
             this.Animations = new Dictionary<string, Animation>();
-            direction = Direction.Right;
+            Direction = Direction.Right;
             spriteEffects = SpriteEffects.None;
             this.bXOffset = (int)(bXOffset * scale);
             this.bYOffset = (int)(bYOffset * scale);
-            this.boundingBox = new BoundingBox(new Vector2(this.X + this.bXOffset, this.Y - this.bYOffset) * Scale, bWidth * this.Scale, bHeight * this.Scale);
+            this.BoundingBox = new BoundingBox(new Vector2(this.Position.X + this.bXOffset, this.Position.Y - this.bYOffset) * Scale, bWidth * this.Scale, bHeight * this.Scale);
             _idleTime = 0;
             _maxIdleTime = 180;
         }
@@ -59,17 +57,19 @@ namespace Shenanijam2019
 
         public void UpdateBoundingPositions()
         {
-            boundingBox.Position = new Vector2(this.X + bXOffset, this.Y - boundingBox.Height - bYOffset);
+            BoundingBox.Position = new Vector2(this.Position.X + bXOffset, this.Position.Y - BoundingBox.Height - bYOffset);
         }
 
         public void Draw(SpriteBatch sb, Camera camera, Texture2D pixel)
         {
+            if(Game1.DEBUG_MODE)
+            {
+                sb.Begin(transformMatrix: camera.TransformationMatrix);
+                sb.Draw(pixel, this.BoundingBox.Bounds, Color.Red);
+                sb.End();
+            }
 
-            sb.Begin(transformMatrix: camera.TransformationMatrix);
-            sb.Draw(pixel, this.boundingBox.Bounds, Color.Red);
-            sb.End();
-
-            currAnim.Draw(sb, new Vector2(this.X, this.Y), this.Scale, spriteEffects, camera);
+            currAnim.Draw(sb, this.Position, this.Scale, spriteEffects, camera);
         }
 
         /// <summary>
@@ -94,8 +94,27 @@ namespace Shenanijam2019
 
     public class Character : GameObject
     {
-        public Character(int x, int y, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0) : base(x, y, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
+        public List<string> Dialog { get; set; }
+        private int _currDialogLine;
+        public bool showTalking { get; set; }
+
+        public Character(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
+            showTalking = false;
+            _currDialogLine = 0;
+        }
+
+        public void AddDialog(string message)
+        {
+            this.Dialog.Add(message);
+        }
+
+        public string GetCurrentLine()
+        {
+            string line = Dialog[_currDialogLine];
+            _currDialogLine++;
+            if(_currDialogLine == Dialog.Count) { _currDialogLine = 0; }
+            return line;
         }
     }
 
@@ -104,21 +123,29 @@ namespace Shenanijam2019
         private KeyboardState _prevKbs;
         private int _wrenches;
 
-        public Player(int x, int y, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(x, y, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
+
+        public Player(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
             _prevKbs = Keyboard.GetState();
             _wrenches = 0;
         }
 
-        public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects)
+        public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects, List<Obstacle> obstacles)
         {
             KeyboardState kbs = Keyboard.GetState();
             spriteEffects = SpriteEffects.None;
             float speedModifier = 1;
 
-            BoundingBox b = this.boundingBox;
+            BoundingBox b = this.BoundingBox;
             GameObject wrench = null;
 
+            Character closest = FindClosestCharacter(npcs);
+
+            //handles talking animation
+            if(Math.Abs(Vector2.Distance(this.Position, closest.Position)) < 64)
+            {
+                closest.showTalking = true;
+            }
 
             //handles diagonals
             if (kbs.GetPressedKeys().Length == 2)
@@ -131,14 +158,15 @@ namespace Shenanijam2019
             {
                 _idleTime = 0;
 
-                b.Position = new Vector2(this.boundingBox.Position.X, this.boundingBox.Position.Y - Speed * dt * speedModifier);
+                b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y - Speed * dt * speedModifier);
 
                 wrench = CheckWrenchCollisions(gameObjects, b);
 
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                    !CheckCollisions(obstacles, b) || wrench != null)
                 {
-                    Y -= Speed * dt * speedModifier;
-                    direction = Direction.Up;
+                    this.Position -= new Vector2(0 , Speed * dt * speedModifier);
+                    Direction = Direction.Up;
                     SetCurrentAnimation("move_back");
                 }
             }
@@ -147,14 +175,15 @@ namespace Shenanijam2019
             {
                 _idleTime = 0;
 
-                b.Position = new Vector2(this.boundingBox.Position.X, this.boundingBox.Position.Y + Speed * dt * speedModifier);
+                b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y + Speed * dt * speedModifier);
 
                 wrench = CheckWrenchCollisions(gameObjects, b);
 
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                    !CheckCollisions(obstacles, b) || wrench != null)
                 {
-                    Y += Speed * dt * speedModifier;
-                    direction = Direction.Down;
+                    this.Position += new Vector2(0, Speed * dt * speedModifier);
+                    Direction = Direction.Down;
                     SetCurrentAnimation("move_forward");
                 }
             }
@@ -163,15 +192,16 @@ namespace Shenanijam2019
             {
                 _idleTime = 0;
 
-                b.Position = new Vector2(this.boundingBox.Position.X - Speed * dt * speedModifier, this.boundingBox.Position.Y);
+                b.Position = new Vector2(this.BoundingBox.Position.X - Speed * dt * speedModifier, this.BoundingBox.Position.Y);
 
                 wrench = CheckWrenchCollisions(gameObjects, b);
 
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                    !CheckCollisions(obstacles, b) || wrench != null)
                 {
-                    X -= Speed * dt * speedModifier;
+                    this.Position -= new Vector2(Speed * dt * speedModifier, 0);
                     SetCurrentAnimation("move_side");
-                    direction = Direction.Left;
+                    Direction = Direction.Left;
                     if (!_prevKbs.IsKeyDown(Keys.A))
                     {
                         currAnim.ResetFrames();
@@ -184,15 +214,16 @@ namespace Shenanijam2019
             {
                 _idleTime = 0;
 
-                b.Position = new Vector2(this.boundingBox.Position.X + Speed * dt * speedModifier, this.boundingBox.Position.Y);
+                b.Position = new Vector2(this.BoundingBox.Position.X + Speed * dt * speedModifier, this.BoundingBox.Position.Y);
 
                 wrench = CheckWrenchCollisions(gameObjects, b);
 
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) || wrench != null)
+                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                    !CheckCollisions(obstacles, b) || wrench != null)
                 {
-                    X += Speed * dt * speedModifier;
+                    this.Position += new Vector2(Speed * dt * speedModifier, 0);
                     SetCurrentAnimation("move_side");
-                    direction = Direction.Right;
+                    Direction = Direction.Right;
                     if (!_prevKbs.IsKeyDown(Keys.D))
                     {
                         currAnim.ResetFrames();
@@ -203,7 +234,7 @@ namespace Shenanijam2019
             if (kbs.GetPressedKeys().Length == 0)
             {
                 SetCurrentAnimation("idle_side");
-                if(direction == Direction.Left)
+                if(Direction == Direction.Left)
                 {
                     spriteEffects = SpriteEffects.FlipHorizontally;
                 }
@@ -211,7 +242,7 @@ namespace Shenanijam2019
                 if (_idleTime > _maxIdleTime && currAnim.IsComplete())
                 {
                     spriteEffects = SpriteEffects.None;
-                    if (direction == Direction.Left)
+                    if (Direction == Direction.Left)
                     {
                         SetCurrentAnimation("idlelong_left");
                     }
@@ -229,8 +260,8 @@ namespace Shenanijam2019
             }
 
             _prevKbs = kbs;
-            camera.X = this.X - (1240 / 6) + 16;
-            camera.Y = this.Y - (720 / 6);
+            camera.X = this.Position.X - (1240 / 6) + 16;
+            camera.Y = this.Position.Y - (720 / 6);
             UpdateBoundingPositions();
             currAnim.Update();
         }
@@ -239,7 +270,7 @@ namespace Shenanijam2019
         {
             foreach(GameObject g in list)
             {
-                if(b.CollisionCheck(g.boundingBox))
+                if(b.CollisionCheck(g.BoundingBox))
                 {
                     return true;
                 }
@@ -251,7 +282,19 @@ namespace Shenanijam2019
         {
             foreach (Character c in list)
             {
-                if (b.CollisionCheck(c.boundingBox))
+                if (b.CollisionCheck(c.BoundingBox))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CheckCollisions(List<Obstacle> list, BoundingBox b)
+        {
+            foreach (Obstacle o in list)
+            {
+                if (b.CollisionCheck(o.BoundingBox))
                 {
                     return true;
                 }
@@ -263,12 +306,32 @@ namespace Shenanijam2019
         {
             foreach (GameObject g in list)
             {
-                if (b.CollisionCheck(g.boundingBox) && g.Name == "wrench")
+                if (b.CollisionCheck(g.BoundingBox) && g.Name == "wrench")
                 {
                     return g;
                 }
             }
             return null;
+        }
+
+        public Character FindClosestCharacter(List<Character> characters)
+        {
+            float closest = float.MaxValue;
+            Character closestChar = null;
+
+            foreach(Character c in characters)
+            {
+                float distance = Math.Abs(Vector2.Distance(this.Position, c.Position));
+                if (distance < closest)
+                {
+                    closest = distance;
+                    closestChar = c;
+                }
+            }
+
+            Debug.WriteLine("Closet Character: " + closestChar.Name);
+
+            return closestChar;
         }
     }
 }

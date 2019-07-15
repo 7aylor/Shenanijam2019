@@ -7,6 +7,12 @@ using Microsoft.Xna.Framework;
 
 namespace Shenanijam2019
 {
+    public interface iHasBoundingBox
+    {
+        string Name { get; set; }
+        BoundingBox BoundingBox { get; set; }
+    }
+
     public class BoundingBox
     {
         /// <summary>

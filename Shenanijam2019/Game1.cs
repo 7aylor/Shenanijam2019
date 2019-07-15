@@ -7,17 +7,17 @@ using MonoGame.Extended.Tiled.Graphics;
 
 namespace Shenanijam2019
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class Game1 : Game
     {
+        public static bool DEBUG_MODE = true;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         const int SPRITE_SCALE = 1;
         Camera camera;
         TiledMapRenderer mapRender;
         TiledMap map;
+
+        SpriteFont font;
 
         #region Characters
         Player player;
@@ -28,6 +28,9 @@ namespace Shenanijam2019
         Character greenGorblork;
         Character orangeGorblork;
         Character purpleGorblork;
+        Character greenNiblix;
+        Character brownNiblix;
+        Character purpleNiblix;
         Character looselyRelatedRobot;
         GameObject wrench;
         #endregion
@@ -50,13 +53,25 @@ namespace Shenanijam2019
         Texture2D orangeGorblorkIdle;
         Texture2D purpleGorblorkIdle;
         Texture2D looselyRelatedIdle;
+        Texture2D greenNiblixIdle;
+        Texture2D purpleNiblixIdle;
+        Texture2D brownNiblixIdle;
 
         //GameObjects
         Texture2D wrenchSpin;
 
         //Environment
         Texture2D main;
+
+        //UI
+        Texture2D dialogPrompt;
         #endregion
+
+        #region Obstacles
+        List<Obstacle> obstacles;
+        #endregion
+
+        Animation dialogPromptAnim;
 
         public Game1()
         {
@@ -68,36 +83,42 @@ namespace Shenanijam2019
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             mapRender = new TiledMapRenderer(GraphicsDevice);
-
-            player = new Player(900, 900, 150, SPRITE_SCALE, "Ralphie", 18, 20, 6, 4);
             camera.Zoom = new Vector2(3, 3);
+
+            player = new Player(new Vector2(750, 750), 150, SPRITE_SCALE, "Ralphie", 16, 8, 8, 8);
 
             npcs = new List<Character>();
             gameObjects = new List<GameObject>();
+            obstacles = new List<Obstacle>();
 
-            tsaMale = new Character(750, 1050, 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
-            tsaFemale = new Character(880, 560, 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
-            greenGorblork = new Character(480, 650, 5, SPRITE_SCALE, "Garble", 16, 20, 6);
-            orangeGorblork = new Character(965, 650, 5, SPRITE_SCALE, "Gurgle", 16, 20, 6);
-            purpleGorblork = new Character(730, 440, 5, SPRITE_SCALE, "Grundle", 16, 20, 6);
-            looselyRelatedRobot = new Character(1000, 1000, 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
-            wrench = new GameObject(575, 575, 5, SPRITE_SCALE, "wrench", 13, 24, 10, 4);
+            tsaMale = new Character(new Vector2(540, 850), 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
+            tsaFemale = new Character(new Vector2(800, 690), 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
+
+            greenGorblork = new Character(new Vector2(670, 720), 5, SPRITE_SCALE, "Garble", 16, 20, 6);
+            orangeGorblork = new Character(new Vector2(755, 660), 5, SPRITE_SCALE, "Gurgle", 16, 20, 6);
+            purpleGorblork = new Character(new Vector2(830, 720), 5, SPRITE_SCALE, "Grundle", 16, 20, 6);
+
+            greenNiblix = new Character(new Vector2(1000, 720), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
+            brownNiblix = new Character(new Vector2(670, 1000), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
+            purpleNiblix = new Character(new Vector2(800, 900), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
+
+            looselyRelatedRobot = new Character(new Vector2(900, 860), 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
+            wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 24, 10, 4);
 
             npcs.Add(tsaMale);
             npcs.Add(tsaFemale);
+
             npcs.Add(greenGorblork);
             npcs.Add(orangeGorblork);
             npcs.Add(purpleGorblork);
+
+            npcs.Add(greenNiblix);
+            npcs.Add(brownNiblix);
+            npcs.Add(purpleNiblix);
+
             npcs.Add(looselyRelatedRobot);
 
             gameObjects.Add(wrench);
@@ -105,20 +126,30 @@ namespace Shenanijam2019
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //set up debug pixel
             _pixel = new Texture2D(GraphicsDevice, 1, 1);
             _pixel.SetData<Color>(new Color[] { Color.White });
 
+            font = Content.Load<SpriteFont>("default_font");
+
+            #region Load Map
             map = Content.Load<TiledMap>("spaceport");
+
+            var objectLayers = map.ObjectLayers;
+            foreach(var objLayer in objectLayers)
+            {
+                for(int i = 0; i < objLayer.Objects.Length; i++)
+                {
+                    var obj = objLayer.Objects[i];
+
+                    obstacles.Add(new Obstacle(obj.Position, obj.Size.Width, obj.Size.Height, obj.Name));
+                }
+            }
+            #endregion
 
             #region LoadTextures
 
@@ -130,7 +161,6 @@ namespace Shenanijam2019
             playerIdleLongRight = Content.Load<Texture2D>("player_idlelong_right");
             playerIdleLongLeft = Content.Load<Texture2D>("player_idlelong_left");
 
-
             //NPCs
             tsaMaleIdle = Content.Load<Texture2D>("tsa_male_idle");
             tsaFemaleIdle = Content.Load<Texture2D>("tsa_female_idle");
@@ -138,13 +168,19 @@ namespace Shenanijam2019
             orangeGorblorkIdle = Content.Load<Texture2D>("orange_gorblork_idle");
             purpleGorblorkIdle = Content.Load<Texture2D>("purple_gorblork_idle");
             looselyRelatedIdle = Content.Load<Texture2D>("loosely_related_idle");
-            #endregion
+            greenNiblixIdle = Content.Load<Texture2D>("green_niblix_idle");
+            purpleNiblixIdle = Content.Load<Texture2D>("purple_niblix_idle");
+            brownNiblixIdle = Content.Load<Texture2D>("brown_niblix_idle");
 
             //GameObjects
             wrenchSpin = Content.Load<Texture2D>("wrench");
 
             //Environment
             main = Content.Load<Texture2D>("main");
+
+            //UI
+            dialogPrompt = Content.Load<Texture2D>("dialog_prompt");
+            #endregion
 
             #region add animations
             //player-robot
@@ -169,31 +205,31 @@ namespace Shenanijam2019
             purpleGorblork.AddAnimation("idle_side", new Animation(32, 32, 8, purpleGorblorkIdle));
             purpleGorblork.SetCurrentAnimation("idle_side");
 
+            greenNiblix.AddAnimation("idle_side", new Animation(32, 32, 8, greenNiblixIdle));
+            greenNiblix.SetCurrentAnimation("idle_side");
+            purpleNiblix.AddAnimation("idle_side", new Animation(32, 32, 8, purpleNiblixIdle));
+            purpleNiblix.SetCurrentAnimation("idle_side");
+            brownNiblix.AddAnimation("idle_side", new Animation(32, 32, 8, brownNiblixIdle));
+            brownNiblix.SetCurrentAnimation("idle_side");
+
             looselyRelatedRobot.AddAnimation("idle_side", new Animation(32, 32, 8, looselyRelatedIdle));
             looselyRelatedRobot.SetCurrentAnimation("idle_side");
 
             //GameObjects
             wrench.AddAnimation("spin", new Animation(32, 32, 8, wrenchSpin));
             wrench.SetCurrentAnimation("spin");
+
+            //UI
+            dialogPromptAnim = new Animation(32, 32, 5, dialogPrompt);
             
             #endregion
-            // TODO: use this.Content to load your game content here
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -211,32 +247,34 @@ namespace Shenanijam2019
                 g.Update();
             }
 
-            player.Update(camera, deltaTime, npcs, gameObjects);
+            dialogPromptAnim.Update();
+
+            player.Update(camera, deltaTime, npcs, gameObjects, obstacles);
 
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(new Color(20 ,16, 19));
 
-            // TODO: Add your drawing code here
-            //spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
-            //spriteBatch.Draw(main, new Vector2(512, 512), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
-            //spriteBatch.End();
+            //draw ground
+            spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
+            spriteBatch.End();
 
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width / SPRITE_SCALE, GraphicsDevice.Viewport.Height / SPRITE_SCALE, 0, 0, -1);
 
             mapRender.Draw(map, camera.TransformationMatrix, projection);
-
             
             foreach(Character c in npcs)
             {
                 c.Draw(spriteBatch, camera, _pixel);
+                if(c.showTalking)
+                {
+                    dialogPromptAnim.Draw(spriteBatch, c.Position - new Vector2(6, 26), SPRITE_SCALE, SpriteEffects.None, camera);
+                    c.showTalking = false;
+                }
             }
 
             foreach (GameObject g in gameObjects)
@@ -246,8 +284,17 @@ namespace Shenanijam2019
 
             player.Draw(spriteBatch, camera, _pixel);
 
+            if(DEBUG_MODE)
+            {
+                spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
+                spriteBatch.DrawString(font, player.Position.X + ", " + player.Position.Y, new Vector2(player.Position.X, player.Position.Y), Color.Red);
+                spriteBatch.End();
+            }
+
+
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0,0,32,32), Color.White, 0, Vector2.Zero, SPRITE_SCALE, SpriteEffects.None, 0);
+            spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0, 0, 32, 32), Color.White, 0, Vector2.Zero, SPRITE_SCALE, SpriteEffects.None, 0);
+
             spriteBatch.End();
 
             base.Draw(gameTime);

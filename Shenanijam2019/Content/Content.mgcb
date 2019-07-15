@@ -14,6 +14,30 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../Art/brown_niblix_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/brown_niblix_idle.png;brown_niblix_idle.png
+
+#begin ../../Art/dialog_prompt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/dialog_prompt.png;dialog_prompt.png
+
 #begin ../../Art/green_gorblork_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -25,6 +49,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/green_gorblork_idle.png;green_gorblork_idle.png
+
+#begin ../../Art/green_niblix_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/green_niblix_idle.png;green_niblix_idle.png
 
 #begin ../../Art/loosely_related_idle.png
 /importer:TextureImporter
@@ -146,6 +182,18 @@
 /processorParam:TextureFormat=Color
 /build:../../Art/purple_gorblork_idle.png;purple_gorblork_idle.png
 
+#begin ../../Art/purple_niblix_idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/purple_niblix_idle.png;purple_niblix_idle.png
+
 #begin ../../Art/spaceport.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
@@ -210,4 +258,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/wrench.png;wrench.png
+
+#begin File.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:File.spritefont;default_font
 
