@@ -14,23 +14,27 @@ namespace Shenanijam2019
         public int SpriteWidth { get; set; }
         public int SpriteHeight { get; set; }
         public int speed { get; set; }
-        public int LoopFrame { get; set; }
+        public int LoopFrameStart { get; set; }
+        public int LoopFrameEnd { get; set; }
+        public bool Reverse { get; set; }
         public Texture2D spriteSheet { get; set; }
         public Vector2 SpriteOrigin { get; set; }
 
         private int _currFrame;
         private int _tickCount;
 
-        public Animation(int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrame = -1)
+        public Animation(int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrameStart = -1, int loopFrameEnd = -1, bool reverse = false)
         {
-            _currFrame = 0;
             this.SpriteWidth = spriteWidth;
             this.SpriteHeight = spriteHeight;
             this.speed = speed;
             this.spriteSheet = spriteSheet;
-            this.LoopFrame = loopFrame;
+            this.LoopFrameStart = loopFrameStart;
+            this.LoopFrameEnd = loopFrameEnd;
             this.TotalFrames = (spriteSheet.Width / SpriteWidth) - 1;
+            this.Reverse = reverse;
             _tickCount = 0;
+            _currFrame = this.Reverse ? this.TotalFrames - 1 : 0;
             SpriteOrigin = new Vector2(0, SpriteHeight);
         }
 
@@ -40,17 +44,34 @@ namespace Shenanijam2019
         public void Update()
         {
             _tickCount++;
+
             if(_tickCount >= speed)
             {
                 _tickCount = 0;
-                if(_currFrame < TotalFrames)
+
+                if(Reverse)
                 {
-                    _currFrame++;
+                    if (_currFrame > 0)
+                    {
+                        _currFrame--;
+                    }
+                    else
+                    {
+                        //goes back to 0 unless there is a loop frame set - TERNARY PROOF FOR GGG
+                        _currFrame = (LoopFrameStart != -1 && _currFrame >= LoopFrameStart) ? LoopFrameStart : TotalFrames - 1;
+                    }
                 }
                 else
                 {
-                    //goes back to 0 unless there is a loop frame set - TERNARY PROOF FOR GGG
-                    _currFrame = (LoopFrame != -1 && _currFrame >= LoopFrame) ? LoopFrame : 0;
+                    if(_currFrame < TotalFrames)
+                    {
+                        _currFrame++;
+                    }
+                    else
+                    {
+                        //goes back to 0 unless there is a loop frame set - TERNARY PROOF FOR GGG
+                        _currFrame = (LoopFrameStart != -1 && _currFrame >= LoopFrameStart) ? LoopFrameStart : 0;
+                    }
                 }
             }
         }

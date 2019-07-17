@@ -121,13 +121,13 @@ namespace Shenanijam2019
     public class Player : Character
     {
         private KeyboardState _prevKbs;
-        private int _wrenches;
+        public int Wrenches { get; set; }
 
 
         public Player(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
             _prevKbs = Keyboard.GetState();
-            _wrenches = 0;
+            this.Wrenches = 0;
         }
 
         public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects, List<Obstacle> obstacles)
@@ -256,7 +256,7 @@ namespace Shenanijam2019
             if(wrench != null)
             {
                 gameObjects.Remove(wrench);
-                _wrenches += 10;
+                Wrenches += 10;
             }
 
             _prevKbs = kbs;

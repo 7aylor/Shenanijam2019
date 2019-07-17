@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Graphics;
+using System;
 
 namespace Shenanijam2019
 {
@@ -17,7 +18,8 @@ namespace Shenanijam2019
         TiledMapRenderer mapRender;
         TiledMap map;
 
-        SpriteFont font;
+        SpriteFont debugFont;
+        SpriteFont uiFont;
 
         #region Characters
         Player player;
@@ -94,15 +96,15 @@ namespace Shenanijam2019
             gameObjects = new List<GameObject>();
             obstacles = new List<Obstacle>();
 
-            tsaMale = new Character(new Vector2(540, 850), 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
-            tsaFemale = new Character(new Vector2(800, 690), 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
+            tsaMale = new Character(new Vector2(545, 830), 5, SPRITE_SCALE, "Mike", 16, 24, 8, 0);
+            tsaFemale = new Character(new Vector2(1092, 505), 5, SPRITE_SCALE, "Megan", 16, 24, 8, 0);
 
             greenGorblork = new Character(new Vector2(670, 720), 5, SPRITE_SCALE, "Garble", 16, 20, 6);
             orangeGorblork = new Character(new Vector2(755, 660), 5, SPRITE_SCALE, "Gurgle", 16, 20, 6);
             purpleGorblork = new Character(new Vector2(830, 720), 5, SPRITE_SCALE, "Grundle", 16, 20, 6);
 
             greenNiblix = new Character(new Vector2(1000, 720), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
-            brownNiblix = new Character(new Vector2(670, 1000), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
+            brownNiblix = new Character(new Vector2(640, 565), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
             purpleNiblix = new Character(new Vector2(800, 900), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
 
             looselyRelatedRobot = new Character(new Vector2(900, 860), 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
@@ -134,7 +136,8 @@ namespace Shenanijam2019
             _pixel = new Texture2D(GraphicsDevice, 1, 1);
             _pixel.SetData<Color>(new Color[] { Color.White });
 
-            font = Content.Load<SpriteFont>("default_font");
+            debugFont = Content.Load<SpriteFont>("default_font");
+            uiFont = Content.Load<SpriteFont>("UI_Text");
 
             #region Load Map
             map = Content.Load<TiledMap>("spaceport");
@@ -287,13 +290,16 @@ namespace Shenanijam2019
             if(DEBUG_MODE)
             {
                 spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
-                spriteBatch.DrawString(font, player.Position.X + ", " + player.Position.Y, new Vector2(player.Position.X, player.Position.Y), Color.Red);
+                spriteBatch.Draw(_pixel, new Rectangle((int)player.Position.X, (int)player.Position.Y, 2, 2), Color.Red);
+                spriteBatch.DrawString(debugFont, "(" + Math.Round(player.Position.X) + ", " + Math.Round(player.Position.Y) + ")", new Vector2(player.Position.X, player.Position.Y), Color.Red);
                 spriteBatch.End();
             }
 
 
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0, 0, 32, 32), Color.White, 0, Vector2.Zero, SPRITE_SCALE, SpriteEffects.None, 0);
+            spriteBatch.Draw(_pixel, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, 64), new Color(0, 0, 0, 175));
+            spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0, 0, 32, 32), Color.White, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
+            spriteBatch.DrawString(uiFont, player.Wrenches.ToString(), new Vector2(56, 12), Color.White);
 
             spriteBatch.End();
 
