@@ -13,7 +13,8 @@ namespace Shenanijam2019
         public int TotalFrames { get; set; }
         public int SpriteWidth { get; set; }
         public int SpriteHeight { get; set; }
-        public int speed { get; set; }
+        public int Speed { get; set; }
+        public bool Loop { get; set; }
         public int LoopFrameStart { get; set; }
         public int LoopFrameEnd { get; set; }
         public bool Reverse { get; set; }
@@ -23,16 +24,17 @@ namespace Shenanijam2019
         private int _currFrame;
         private int _tickCount;
 
-        public Animation(int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrameStart = -1, int loopFrameEnd = -1, bool reverse = false)
+        public Animation(int spriteWidth, int spriteHeight, int speed, Texture2D spriteSheet, int loopFrameStart = -1, int loopFrameEnd = -1, bool reverse = false, bool loop = true)
         {
             this.SpriteWidth = spriteWidth;
             this.SpriteHeight = spriteHeight;
-            this.speed = speed;
+            this.Speed = speed;
             this.spriteSheet = spriteSheet;
             this.LoopFrameStart = loopFrameStart;
-            this.LoopFrameEnd = loopFrameEnd;
             this.TotalFrames = (spriteSheet.Width / SpriteWidth) - 1;
+            this.LoopFrameEnd = loopFrameEnd == -1 ? this.TotalFrames : loopFrameEnd;
             this.Reverse = reverse;
+            this.Loop = loop;
             _tickCount = 0;
             _currFrame = this.Reverse ? this.TotalFrames - 1 : 0;
             SpriteOrigin = new Vector2(0, SpriteHeight);
@@ -45,7 +47,12 @@ namespace Shenanijam2019
         {
             _tickCount++;
 
-            if(_tickCount >= speed)
+            if(!Loop && _currFrame >= TotalFrames)
+            {
+                return;
+            }
+
+            if(_tickCount >= Speed)
             {
                 _tickCount = 0;
 
@@ -63,7 +70,7 @@ namespace Shenanijam2019
                 }
                 else
                 {
-                    if(_currFrame < TotalFrames)
+                    if(_currFrame < this.LoopFrameEnd)
                     {
                         _currFrame++;
                     }

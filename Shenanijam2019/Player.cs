@@ -96,11 +96,13 @@ namespace Shenanijam2019
     {
         public List<string> Dialog { get; set; }
         private int _currDialogLine;
-        public bool showTalking { get; set; }
+        public bool ShowDialogPrompt { get; set; }
+        public bool ShowDialog { get; set; }
 
         public Character(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
-            showTalking = false;
+            Dialog = new List<string>();
+            ShowDialogPrompt = false;
             _currDialogLine = 0;
         }
 
@@ -123,7 +125,6 @@ namespace Shenanijam2019
         private KeyboardState _prevKbs;
         public int Wrenches { get; set; }
 
-
         public Player(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
             _prevKbs = Keyboard.GetState();
@@ -139,12 +140,17 @@ namespace Shenanijam2019
             BoundingBox b = this.BoundingBox;
             GameObject wrench = null;
 
-            Character closest = FindClosestCharacter(npcs);
+            Character closestNpc = FindClosestCharacter(npcs);
 
             //handles talking animation
-            if(Math.Abs(Vector2.Distance(this.Position, closest.Position)) < 64)
+            if(Math.Abs(Vector2.Distance(this.Position, closestNpc.Position)) < 64)
             {
-                closest.showTalking = true;
+                closestNpc.ShowDialogPrompt = true;
+            }
+
+            if(kbs.IsKeyDown(Keys.E))
+            {
+                closestNpc.ShowDialog = true;
             }
 
             //handles diagonals

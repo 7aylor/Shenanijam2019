@@ -10,7 +10,7 @@ namespace Shenanijam2019
 {
     public class Game1 : Game
     {
-        public static bool DEBUG_MODE = true;
+        public static bool DEBUG_MODE = false;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         const int SPRITE_SCALE = 1;
@@ -108,7 +108,7 @@ namespace Shenanijam2019
             purpleNiblix = new Character(new Vector2(800, 900), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
 
             looselyRelatedRobot = new Character(new Vector2(900, 860), 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
-            wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 24, 10, 4);
+            wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 32, 10, -8);
 
             npcs.Add(tsaMale);
             npcs.Add(tsaFemale);
@@ -124,6 +124,11 @@ namespace Shenanijam2019
             npcs.Add(looselyRelatedRobot);
 
             gameObjects.Add(wrench);
+
+            foreach(Character c in npcs)
+            {
+                c.AddDialog(c.Name + " test dialog");
+            }
 
             base.Initialize();
         }
@@ -223,7 +228,7 @@ namespace Shenanijam2019
             wrench.SetCurrentAnimation("spin");
 
             //UI
-            dialogPromptAnim = new Animation(32, 32, 5, dialogPrompt);
+            dialogPromptAnim = new Animation(32, 32, 5, dialogPrompt, 2, 20);
             
             #endregion
         }
@@ -261,32 +266,50 @@ namespace Shenanijam2019
         {
             GraphicsDevice.Clear(new Color(20 ,16, 19));
 
-            //draw ground
+            #region draw ground
             spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
             spriteBatch.Draw(main, new Vector2(0, 0), color: Color.White, scale: SPRITE_SCALE * Vector2.One);
             spriteBatch.End();
+            #endregion
 
+            #region  draw map
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width / SPRITE_SCALE, GraphicsDevice.Viewport.Height / SPRITE_SCALE, 0, 0, -1);
 
             mapRender.Draw(map, camera.TransformationMatrix, projection);
-            
-            foreach(Character c in npcs)
+            #endregion
+
+            #region draw dialog prompt, characters
+            bool hasDrawnDialogPrompt = false;
+
+            for(int i = 0; i < npcs.Count; i++)
             {
-                c.Draw(spriteBatch, camera, _pixel);
-                if(c.showTalking)
+                //draw characters
+                npcs[i].Draw(spriteBatch, camera, _pixel);
+                if(npcs[i].ShowDialogPrompt)
                 {
-                    dialogPromptAnim.Draw(spriteBatch, c.Position - new Vector2(6, 26), SPRITE_SCALE, SpriteEffects.None, camera);
-                    c.showTalking = false;
+                    hasDrawnDialogPrompt = true;
+                    dialogPromptAnim.Draw(spriteBatch, npcs[i].Position - new Vector2(6, 26), SPRITE_SCALE, SpriteEffects.None, camera);
+                    npcs[i].ShowDialogPrompt = false; //set to false so only one prompt will appear
+                }
+                //ensures a fade in on each change of character with a prompt
+                else if(i == npcs.Count - 1 && hasDrawnDialogPrompt == false)
+                {
+                    dialogPromptAnim.ResetFrames();
                 }
             }
+            #endregion
 
+            #region draw gameobjects
             foreach (GameObject g in gameObjects)
             {
                 g.Draw(spriteBatch, camera, _pixel);
             }
+            #endregion
 
+            //draw player
             player.Draw(spriteBatch, camera, _pixel);
 
+            #region draw debug
             if(DEBUG_MODE)
             {
                 spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
@@ -294,14 +317,29 @@ namespace Shenanijam2019
                 spriteBatch.DrawString(debugFont, "(" + Math.Round(player.Position.X) + ", " + Math.Round(player.Position.Y) + ")", new Vector2(player.Position.X, player.Position.Y), Color.Red);
                 spriteBatch.End();
             }
+            #endregion
 
-
+            #region draw ui
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             spriteBatch.Draw(_pixel, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, 64), new Color(0, 0, 0, 175));
             spriteBatch.Draw(wrenchSpin, Vector2.Zero, new Rectangle(0, 0, 32, 32), Color.White, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
             spriteBatch.DrawString(uiFont, player.Wrenches.ToString(), new Vector2(56, 12), Color.White);
 
             spriteBatch.End();
+            #endregion
+
+            #region draw dialog
+            foreach(Character c in npcs)
+            {
+                if(c.ShowDialog)
+                {
+                    spriteBatch.Begin();
+                    spriteBatch.DrawString(uiFont, c.Dialog[0], new Vector2(300, 300), Color.Purple);
+                    spriteBatch.End();
+                    c.ShowDialog = false;
+                }
+            }
+            #endregion
 
             base.Draw(gameTime);
         }
