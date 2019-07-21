@@ -38,6 +38,18 @@
 /processorParam:TextureFormat=Color
 /build:../../Art/dialog_prompt.png;dialog_prompt.png
 
+#begin ../../Art/food_shack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/food_shack.png;food_shack.png
+
 #begin ../../Art/green_gorblork_idle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -73,6 +85,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/loosely_related_idle.png;loosely_related_idle.png
+
+#begin ../../Art/lootbox_machine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/lootbox_machine.png;lootbox_machine.png
 
 #begin ../../Art/main.png
 /importer:TextureImporter
@@ -234,6 +258,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Art/tsa_male_idle.png;tsa_male_idle.png
+
+#begin ../../Art/vending_machine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Art/vending_machine.png;vending_machine.png
 
 #begin ../../Art/walls_sprite.png
 /importer:TextureImporter

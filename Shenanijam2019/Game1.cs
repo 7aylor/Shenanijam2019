@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Graphics;
 using System;
+using System.Diagnostics;
 
 namespace Shenanijam2019
 {
@@ -34,7 +35,6 @@ namespace Shenanijam2019
         Character brownNiblix;
         Character purpleNiblix;
         Character looselyRelatedRobot;
-        GameObject wrench;
         #endregion
 
         #region Textures
@@ -61,6 +61,8 @@ namespace Shenanijam2019
 
         //GameObjects
         Texture2D wrenchSpin;
+        Texture2D vendingMachineBlueDefault;
+        Texture2D lootBoxDefault;
 
         //Environment
         Texture2D main;
@@ -71,6 +73,12 @@ namespace Shenanijam2019
 
         #region Obstacles
         List<Obstacle> obstacles;
+        #endregion
+
+        #region GameObjects
+        GameObject wrench;
+        GameObject vendingMachineBlue;
+        GameObject lootBox;
         #endregion
 
         Animation dialogPromptAnim;
@@ -108,7 +116,10 @@ namespace Shenanijam2019
             purpleNiblix = new Character(new Vector2(800, 900), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
 
             looselyRelatedRobot = new Character(new Vector2(900, 860), 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
+
             wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 32, 10, -8);
+            vendingMachineBlue = new GameObject(new Vector2(928, 192), 5, SPRITE_SCALE, "Vending Machine", 32, 64);
+            lootBox = new GameObject(new Vector2(1184, 192), 5, SPRITE_SCALE, "Loot Box", 32, 64);
 
             npcs.Add(tsaMale);
             npcs.Add(tsaFemale);
@@ -124,9 +135,12 @@ namespace Shenanijam2019
             npcs.Add(looselyRelatedRobot);
 
             gameObjects.Add(wrench);
+            gameObjects.Add(vendingMachineBlue);
+            gameObjects.Add(lootBox);
 
-            foreach(Character c in npcs)
+            foreach (Character c in npcs)
             {
+                Debug.WriteLine(c.Name + " dialog added");
                 c.AddDialog(c.Name + " test dialog");
             }
 
@@ -182,6 +196,8 @@ namespace Shenanijam2019
 
             //GameObjects
             wrenchSpin = Content.Load<Texture2D>("wrench");
+            vendingMachineBlueDefault = Content.Load<Texture2D>("vending_machine");
+            lootBoxDefault = Content.Load<Texture2D>("lootbox_machine");
 
             //Environment
             main = Content.Load<Texture2D>("main");
@@ -226,6 +242,12 @@ namespace Shenanijam2019
             //GameObjects
             wrench.AddAnimation("spin", new Animation(32, 32, 8, wrenchSpin));
             wrench.SetCurrentAnimation("spin");
+
+            vendingMachineBlue.AddAnimation("default", new Animation(32, 64, 8, vendingMachineBlueDefault));
+            vendingMachineBlue.SetCurrentAnimation("default");
+
+            lootBox.AddAnimation("default", new Animation(32, 64, 8, lootBoxDefault));
+            lootBox.SetCurrentAnimation("default");
 
             //UI
             dialogPromptAnim = new Animation(32, 32, 5, dialogPrompt, 2, 20);
@@ -334,9 +356,9 @@ namespace Shenanijam2019
                 if(c.ShowDialog)
                 {
                     spriteBatch.Begin();
-                    spriteBatch.DrawString(uiFont, c.Dialog[0], new Vector2(300, 300), Color.Purple);
+                    spriteBatch.Draw(_pixel, new Rectangle(0, 500, graphics.PreferredBackBufferWidth, 300), Color.Black);
+                    spriteBatch.DrawString(uiFont, c.Dialog[c.currDialogLine], new Vector2(100, 600), Color.White);
                     spriteBatch.End();
-                    c.ShowDialog = false;
                 }
             }
             #endregion

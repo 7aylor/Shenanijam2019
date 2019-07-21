@@ -95,7 +95,7 @@ namespace Shenanijam2019
     public class Character : GameObject
     {
         public List<string> Dialog { get; set; }
-        private int _currDialogLine;
+        public int currDialogLine;
         public bool ShowDialogPrompt { get; set; }
         public bool ShowDialog { get; set; }
 
@@ -103,7 +103,7 @@ namespace Shenanijam2019
         {
             Dialog = new List<string>();
             ShowDialogPrompt = false;
-            _currDialogLine = 0;
+            currDialogLine = 0;
         }
 
         public void AddDialog(string message)
@@ -111,12 +111,15 @@ namespace Shenanijam2019
             this.Dialog.Add(message);
         }
 
-        public string GetCurrentLine()
+        public void UpdateDialogLine()
         {
-            string line = Dialog[_currDialogLine];
-            _currDialogLine++;
-            if(_currDialogLine == Dialog.Count) { _currDialogLine = 0; }
-            return line;
+            currDialogLine++;
+
+            if (currDialogLine >= Dialog.Count)
+            {
+                currDialogLine = 0;
+                this.ShowDialog = false;
+            }
         }
     }
 
@@ -151,6 +154,7 @@ namespace Shenanijam2019
             if(kbs.IsKeyDown(Keys.E))
             {
                 closestNpc.ShowDialog = true;
+                //closestNpc.UpdateDialogLine();
             }
 
             //handles diagonals
