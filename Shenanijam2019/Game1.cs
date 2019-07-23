@@ -144,6 +144,10 @@ namespace Shenanijam2019
                 c.AddDialog(c.Name + " test dialog");
             }
 
+            tsaMale.AddDialog("This is line 2");
+            tsaMale.AddDialog("This is line 31231231231231231231231231231231231231231231231");
+
+
             base.Initialize();
         }
 

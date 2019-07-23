@@ -103,7 +103,7 @@ namespace Shenanijam2019
         {
             Dialog = new List<string>();
             ShowDialogPrompt = false;
-            currDialogLine = 0;
+            currDialogLine = -1;
         }
 
         public void AddDialog(string message)
@@ -117,14 +117,20 @@ namespace Shenanijam2019
 
             if (currDialogLine >= Dialog.Count)
             {
-                currDialogLine = 0;
-                this.ShowDialog = false;
+                ResetDialog();
             }
+        }
+
+        public void ResetDialog()
+        {
+            currDialogLine = -1;
+            this.ShowDialog = false;
         }
     }
 
     public class Player : Character
     {
+        private KeyboardState _kbs;
         private KeyboardState _prevKbs;
         public int Wrenches { get; set; }
 
@@ -136,7 +142,12 @@ namespace Shenanijam2019
 
         public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects, List<Obstacle> obstacles)
         {
-            KeyboardState kbs = Keyboard.GetState();
+            if(_kbs != null)
+            {
+                _prevKbs = _kbs;
+            }
+
+            _kbs = Keyboard.GetState();
             spriteEffects = SpriteEffects.None;
             float speedModifier = 1;
 
@@ -151,103 +162,101 @@ namespace Shenanijam2019
                 closestNpc.ShowDialogPrompt = true;
             }
 
-            if(kbs.IsKeyDown(Keys.E))
+            if(_kbs.IsKeyDown(Keys.E) && !_prevKbs.IsKeyDown(Keys.E))
             {
                 closestNpc.ShowDialog = true;
-                //closestNpc.UpdateDialogLine();
+                closestNpc.UpdateDialogLine();
             }
 
             //handles diagonals
-            if (kbs.GetPressedKeys().Length == 2)
+            if (_kbs.GetPressedKeys().Length == 2)
             {
                 speedModifier *= 0.707f;
             }
 
-            //up
-            if (kbs.IsKeyDown(Keys.W))
+            if (!closestNpc.ShowDialog)
             {
-                _idleTime = 0;
-
-                b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y - Speed * dt * speedModifier);
-
-                wrench = CheckWrenchCollisions(gameObjects, b);
-
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
-                    !CheckCollisions(obstacles, b) || wrench != null)
+                //up
+                if (_kbs.IsKeyDown(Keys.W))
                 {
-                    this.Position -= new Vector2(0 , Speed * dt * speedModifier);
-                    Direction = Direction.Up;
-                    SetCurrentAnimation("move_back");
-                }
-            }
-            //down
-            if (kbs.IsKeyDown(Keys.S))
-            {
-                _idleTime = 0;
+                    _idleTime = 0;
 
-                b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y + Speed * dt * speedModifier);
+                    b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y - Speed * dt * speedModifier);
 
-                wrench = CheckWrenchCollisions(gameObjects, b);
+                    wrench = CheckWrenchCollisions(gameObjects, b);
 
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
-                    !CheckCollisions(obstacles, b) || wrench != null)
-                {
-                    this.Position += new Vector2(0, Speed * dt * speedModifier);
-                    Direction = Direction.Down;
-                    SetCurrentAnimation("move_forward");
-                }
-            }
-            //left
-            if (kbs.IsKeyDown(Keys.A))
-            {
-                _idleTime = 0;
-
-                b.Position = new Vector2(this.BoundingBox.Position.X - Speed * dt * speedModifier, this.BoundingBox.Position.Y);
-
-                wrench = CheckWrenchCollisions(gameObjects, b);
-
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
-                    !CheckCollisions(obstacles, b) || wrench != null)
-                {
-                    this.Position -= new Vector2(Speed * dt * speedModifier, 0);
-                    SetCurrentAnimation("move_side");
-                    Direction = Direction.Left;
-                    if (!_prevKbs.IsKeyDown(Keys.A))
+                    if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                        !CheckCollisions(obstacles, b) || wrench != null)
                     {
-                        currAnim.ResetFrames();
+                        this.Position -= new Vector2(0, Speed * dt * speedModifier);
+                        Direction = Direction.Up;
+                        SetCurrentAnimation("move_back");
                     }
                 }
-                spriteEffects = SpriteEffects.FlipHorizontally;
-            }
-            //right
-            if (kbs.IsKeyDown(Keys.D))
-            {
-                _idleTime = 0;
-
-                b.Position = new Vector2(this.BoundingBox.Position.X + Speed * dt * speedModifier, this.BoundingBox.Position.Y);
-
-                wrench = CheckWrenchCollisions(gameObjects, b);
-
-                if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
-                    !CheckCollisions(obstacles, b) || wrench != null)
+                //down
+                if (_kbs.IsKeyDown(Keys.S))
                 {
-                    this.Position += new Vector2(Speed * dt * speedModifier, 0);
-                    SetCurrentAnimation("move_side");
-                    Direction = Direction.Right;
-                    if (!_prevKbs.IsKeyDown(Keys.D))
+                    _idleTime = 0;
+
+                    b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y + Speed * dt * speedModifier);
+
+                    wrench = CheckWrenchCollisions(gameObjects, b);
+
+                    if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                        !CheckCollisions(obstacles, b) || wrench != null)
                     {
-                        currAnim.ResetFrames();
+                        this.Position += new Vector2(0, Speed * dt * speedModifier);
+                        Direction = Direction.Down;
+                        SetCurrentAnimation("move_forward");
+                    }
+                }
+                //left
+                if (_kbs.IsKeyDown(Keys.A))
+                {
+                    _idleTime = 0;
+
+                    b.Position = new Vector2(this.BoundingBox.Position.X - Speed * dt * speedModifier, this.BoundingBox.Position.Y);
+
+                    wrench = CheckWrenchCollisions(gameObjects, b);
+
+                    if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                        !CheckCollisions(obstacles, b) || wrench != null)
+                    {
+                        this.Position -= new Vector2(Speed * dt * speedModifier, 0);
+                        SetCurrentAnimation("move_side");
+                        Direction = Direction.Left;
+                        if (!_prevKbs.IsKeyDown(Keys.A))
+                        {
+                            currAnim.ResetFrames();
+                        }
+                    }
+                }
+                //right
+                if (_kbs.IsKeyDown(Keys.D))
+                {
+                    _idleTime = 0;
+
+                    b.Position = new Vector2(this.BoundingBox.Position.X + Speed * dt * speedModifier, this.BoundingBox.Position.Y);
+
+                    wrench = CheckWrenchCollisions(gameObjects, b);
+
+                    if (!CheckCollisions(npcs, b) && !CheckCollisions(gameObjects, b) &&
+                        !CheckCollisions(obstacles, b) || wrench != null)
+                    {
+                        this.Position += new Vector2(Speed * dt * speedModifier, 0);
+                        SetCurrentAnimation("move_side");
+                        Direction = Direction.Right;
+                        if (!_prevKbs.IsKeyDown(Keys.D))
+                        {
+                            currAnim.ResetFrames();
+                        }
                     }
                 }
             }
 
-            if (kbs.GetPressedKeys().Length == 0)
+            if (_kbs.GetPressedKeys().Length == 0)
             {
                 SetCurrentAnimation("idle_side");
-                if(Direction == Direction.Left)
-                {
-                    spriteEffects = SpriteEffects.FlipHorizontally;
-                }
                 _idleTime++;
                 if (_idleTime > _maxIdleTime && currAnim.IsComplete())
                 {
@@ -269,7 +278,11 @@ namespace Shenanijam2019
                 Wrenches += 10;
             }
 
-            _prevKbs = kbs;
+            if (Direction == Direction.Left)
+            {
+                spriteEffects = SpriteEffects.FlipHorizontally;
+            }
+
             camera.X = this.Position.X - (1240 / 6) + 16;
             camera.Y = this.Position.Y - (720 / 6);
             UpdateBoundingPositions();
