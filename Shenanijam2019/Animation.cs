@@ -100,7 +100,7 @@ namespace Shenanijam2019
         }
 
         /// <summary>
-        /// draw the sprite, considering size
+        /// draw the sprite, considering size and using camera
         /// </summary>
         /// <param name="sb"></param>
         /// <param name="position"></param>

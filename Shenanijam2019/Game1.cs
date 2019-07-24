@@ -141,11 +141,11 @@ namespace Shenanijam2019
             foreach (Character c in npcs)
             {
                 Debug.WriteLine(c.Name + " dialog added");
-                c.AddDialog(c.Name + " test dialog");
+                c.Dialog.AddDialog(c.Name + " test dialog");
             }
 
-            tsaMale.AddDialog("This is line 2");
-            tsaMale.AddDialog("This is line 31231231231231231231231231231231231231231231231");
+            tsaMale.Dialog.AddDialog("This is line 2");
+            tsaMale.Dialog.AddDialog("This is line 31231231231231231231231231231231231231231231231");
 
 
             base.Initialize();
@@ -273,7 +273,7 @@ namespace Shenanijam2019
 
             foreach (Character c in npcs)
             {
-                c.Update();
+                c.Update(gameTime);
             }
 
             foreach(GameObject g in gameObjects)
@@ -357,12 +357,13 @@ namespace Shenanijam2019
             #region draw dialog
             foreach(Character c in npcs)
             {
-                if(c.ShowDialog)
+                if(c.Dialog.DrawDialog)
                 {
                     spriteBatch.Begin();
                     spriteBatch.Draw(_pixel, new Rectangle(0, 500, graphics.PreferredBackBufferWidth, 300), Color.Black);
-                    spriteBatch.DrawString(uiFont, c.Dialog[c.currDialogLine], new Vector2(100, 600), Color.White);
                     spriteBatch.End();
+
+                    c.Dialog.Draw(spriteBatch, uiFont, new Vector2(100, 600), Color.White);
                 }
             }
             #endregion

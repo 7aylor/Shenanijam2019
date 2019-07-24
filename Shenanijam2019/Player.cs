@@ -94,37 +94,23 @@ namespace Shenanijam2019
 
     public class Character : GameObject
     {
-        public List<string> Dialog { get; set; }
-        public int currDialogLine;
+        public Dialog Dialog { get; set; }
         public bool ShowDialogPrompt { get; set; }
-        public bool ShowDialog { get; set; }
 
         public Character(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset = 0, int bYOffset = 0) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
         {
-            Dialog = new List<string>();
+            Dialog = new Dialog();
             ShowDialogPrompt = false;
-            currDialogLine = -1;
         }
 
-        public void AddDialog(string message)
+        public void Update(GameTime gameTime)
         {
-            this.Dialog.Add(message);
-        }
+            base.Update();
 
-        public void UpdateDialogLine()
-        {
-            currDialogLine++;
-
-            if (currDialogLine >= Dialog.Count)
+            if(Dialog.IsScrolling)
             {
-                ResetDialog();
+                Dialog.Update(gameTime);
             }
-        }
-
-        public void ResetDialog()
-        {
-            currDialogLine = -1;
-            this.ShowDialog = false;
         }
     }
 
@@ -148,7 +134,6 @@ namespace Shenanijam2019
             }
 
             _kbs = Keyboard.GetState();
-            spriteEffects = SpriteEffects.None;
             float speedModifier = 1;
 
             BoundingBox b = this.BoundingBox;
@@ -162,10 +147,13 @@ namespace Shenanijam2019
                 closestNpc.ShowDialogPrompt = true;
             }
 
-            if(_kbs.IsKeyDown(Keys.E) && !_prevKbs.IsKeyDown(Keys.E))
+            //controls when the player talks to an npc
+            if(_kbs.IsKeyDown(Keys.E) && !_prevKbs.IsKeyDown(Keys.E) && !closestNpc.Dialog.IsScrolling)
             {
-                closestNpc.ShowDialog = true;
-                closestNpc.UpdateDialogLine();
+                closestNpc.Dialog.DrawDialog = true;
+                closestNpc.Dialog.IsScrolling = true;
+                closestNpc.Dialog.UpdateDialogLine();
+                FaceTalkingNpc(closestNpc);
             }
 
             //handles diagonals
@@ -174,8 +162,10 @@ namespace Shenanijam2019
                 speedModifier *= 0.707f;
             }
 
-            if (!closestNpc.ShowDialog)
+            if (!closestNpc.Dialog.DrawDialog)
             {
+                spriteEffects = SpriteEffects.None;
+
                 //up
                 if (_kbs.IsKeyDown(Keys.W))
                 {
@@ -254,20 +244,30 @@ namespace Shenanijam2019
                 }
             }
 
+            //Idle animations
             if (_kbs.GetPressedKeys().Length == 0)
             {
                 SetCurrentAnimation("idle_side");
                 _idleTime++;
                 if (_idleTime > _maxIdleTime && currAnim.IsComplete())
                 {
-                    spriteEffects = SpriteEffects.None;
-                    if (Direction == Direction.Left)
+                    //don't go to sleep if talking
+                    if(!closestNpc.Dialog.DrawDialog)
                     {
-                        SetCurrentAnimation("idlelong_left");
+                        spriteEffects = SpriteEffects.None;
+                        if (Direction == Direction.Left)
+                        {
+                            SetCurrentAnimation("idlelong_left");
+                        }
+                        else
+                        {
+                            SetCurrentAnimation("idlelong_right");
+                        }
                     }
                     else
                     {
-                        SetCurrentAnimation("idlelong_right");
+                        //reset idle time if talking so when done talking you don't instantly sleep
+                        _idleTime = 0;
                     }
                 }
             }
@@ -287,6 +287,27 @@ namespace Shenanijam2019
             camera.Y = this.Position.Y - (720 / 6);
             UpdateBoundingPositions();
             currAnim.Update();
+        }
+
+        /// <summary>
+        /// comapares the positions of the players that are talking together and makes them face eachother
+        /// </summary>
+        /// <param name="pos"></param>
+        private void FaceTalkingNpc(Character c)
+        {
+            if (c.Position.X < this.Position.X)
+            {
+                this.Direction = Direction.Left;
+                c.Direction = Direction.Right;
+                c.spriteEffects = SpriteEffects.FlipHorizontally;
+            }
+            else
+            {
+                this.Direction = Direction.Right;
+                this.spriteEffects = SpriteEffects.None;
+                c.Direction = Direction.Left;
+                c.spriteEffects = SpriteEffects.None;
+            }
         }
 
         public bool CheckCollisions(List<GameObject> list, BoundingBox b)
