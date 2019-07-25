@@ -118,6 +118,7 @@ namespace Shenanijam2019
     {
         private KeyboardState _kbs;
         private KeyboardState _prevKbs;
+        private int _talkDistance = 48;
         public int Wrenches { get; set; }
 
         public Player(Vector2 position, int speed, float Scale, string name, int bWidth, int bHeight, int bXOffset, int bYOffset) : base(position, speed, Scale, name, bWidth, bHeight, bXOffset, bYOffset)
@@ -142,7 +143,7 @@ namespace Shenanijam2019
             Character closestNpc = FindClosestCharacter(npcs);
 
             //handles talking animation
-            if(Math.Abs(Vector2.Distance(this.Position, closestNpc.Position)) < 64)
+            if(Math.Abs(Vector2.Distance(this.Position, closestNpc.Position)) < _talkDistance)
             {
                 closestNpc.ShowDialogPrompt = true;
             }
