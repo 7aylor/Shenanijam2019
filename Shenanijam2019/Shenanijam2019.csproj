@@ -45,6 +45,7 @@
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Containers\Characters.cs" />
+    <Compile Include="Containers\GameObjects.cs" />
     <Compile Include="Containers\UI.cs" />
     <Compile Include="Dialog.cs" />
     <Compile Include="Game1.cs" />

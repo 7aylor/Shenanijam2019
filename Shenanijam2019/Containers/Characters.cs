@@ -58,7 +58,7 @@ namespace Shenanijam2019
             tsaMale.Dialog.AddDialog("This is line 31231231231231231231231231231231231231231231231");
         }
 
-        public static void LoadTextures()
+        public static void Load()
         {
             tsaMale.AddAnimation("idle_side", new Animation(32, 32, 8, Textures.tsaMaleIdle));
             tsaMale.SetCurrentAnimation("idle_side");

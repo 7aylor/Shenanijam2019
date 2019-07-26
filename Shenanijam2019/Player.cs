@@ -127,9 +127,12 @@ namespace Shenanijam2019
             this.Wrenches = 0;
         }
 
-        public void Update(Camera camera, float dt, List<Character> npcs, List<GameObject> gameObjects, List<Obstacle> obstacles)
+        public void Update(Camera camera, float dt, List<Obstacle> obstacles)
         {
-            if(_kbs != null)
+            List<Character> npcs = Characters.Npcs;
+            List<GameObject> gameObjects = GameObjects.Objects;
+
+            if (_kbs != null)
             {
                 _prevKbs = _kbs;
             }

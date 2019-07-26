@@ -19,20 +19,8 @@ namespace Shenanijam2019
         TiledMap map;
         const int SPRITE_SCALE = 1;
 
-        #region Characters
         public static Player player;
-        List<GameObject> gameObjects;
-        #endregion
-
-        #region Obstacles
         List<Obstacle> obstacles;
-        #endregion
-
-        #region GameObjects
-        GameObject wrench;
-        GameObject vendingMachineBlue;
-        GameObject lootBox;
-        #endregion
 
         public Game1()
         {
@@ -52,17 +40,9 @@ namespace Shenanijam2019
             player = new Player(new Vector2(750, 750), 150, SPRITE_SCALE, "Ralphie", 16, 8, 8, 8);
 
             Characters.Initialize();
+            GameObjects.Initialize();
 
-            gameObjects = new List<GameObject>();
             obstacles = new List<Obstacle>();
-
-            wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 32, 10, -8);
-            vendingMachineBlue = new GameObject(new Vector2(928, 192), 5, SPRITE_SCALE, "Vending Machine", 32, 64);
-            lootBox = new GameObject(new Vector2(1184, 192), 5, SPRITE_SCALE, "Loot Box", 32, 64);
-
-            gameObjects.Add(wrench);
-            gameObjects.Add(vendingMachineBlue);
-            gameObjects.Add(lootBox);
 
             base.Initialize();
         }
@@ -70,12 +50,10 @@ namespace Shenanijam2019
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
             Textures.Load(this.Content, this.GraphicsDevice);
 
-            //set up debug pixel
-            Textures.pixel.SetData<Color>(new Color[] { Color.White });
-
-            #region Load Map
+            #region Load Map obstacles
             map = Content.Load<TiledMap>("spaceport");
 
             var objectLayers = map.ObjectLayers;
@@ -90,8 +68,6 @@ namespace Shenanijam2019
             }
             #endregion
 
-
-            #region add animations
             //player-robot
             player.AddAnimation("move_forward", new Animation(32, 33, 8, Textures.playerMoveForward, 4));
             player.AddAnimation("move_back", new Animation(32, 33, 8, Textures.playerMoveBack, 4));
@@ -101,27 +77,12 @@ namespace Shenanijam2019
             player.AddAnimation("idlelong_left", new Animation(31, 42, 8, Textures.playerIdleLongLeft, 3));
             player.SetCurrentAnimation("idlelong_side");
 
-            Characters.LoadTextures();
-
-            //GameObjects
-            wrench.AddAnimation("spin", new Animation(32, 32, 8, Textures.wrenchSpin));
-            wrench.SetCurrentAnimation("spin");
-
-            vendingMachineBlue.AddAnimation("default", new Animation(32, 64, 8, Textures.vendingMachineBlueDefault));
-            vendingMachineBlue.SetCurrentAnimation("default");
-
-            lootBox.AddAnimation("default", new Animation(32, 64, 8, Textures.lootBoxDefault));
-            lootBox.SetCurrentAnimation("default");
-
-
+            Characters.Load();
+            GameObjects.Load();
             UI.Load(this.Content);
-            #endregion
         }
 
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
+        protected override void UnloadContent() {}
 
         protected override void Update(GameTime gameTime)
         {
@@ -131,15 +92,9 @@ namespace Shenanijam2019
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Characters.Update(gameTime);
-
-            foreach(GameObject g in gameObjects)
-            {
-                g.Update();
-            }
-
+            GameObjects.Update();
             UI.Update();
-
-            player.Update(camera, deltaTime, Characters.Npcs, gameObjects, obstacles);
+            player.Update(camera, deltaTime, obstacles);
 
             base.Update(gameTime);
         }
@@ -161,30 +116,9 @@ namespace Shenanijam2019
             #endregion
 
             Characters.Draw(spriteBatch, camera);
-
-            #region draw gameobjects
-            foreach (GameObject g in gameObjects)
-            {
-                g.Draw(spriteBatch, camera, Textures.pixel);
-            }
-            #endregion
-
-            //draw player
+            GameObjects.Draw(spriteBatch, camera);
             player.Draw(spriteBatch, camera, Textures.pixel);
-
-            #region draw debug
-            if(DEBUG_MODE)
-            {
-                spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
-                spriteBatch.Draw(Textures.pixel, new Rectangle((int)player.Position.X, (int)player.Position.Y, 2, 2), Color.Red);
-                spriteBatch.DrawString(UI.debugFont, "(" + Math.Round(player.Position.X) + ", " + Math.Round(player.Position.Y) + ")", new Vector2(player.Position.X, player.Position.Y), Color.Red);
-                spriteBatch.End();
-            }
-            #endregion
-
-            #region draw ui
             UI.Draw(spriteBatch, graphics);
-            #endregion
 
             #region draw dialog
             foreach(Character c in Characters.Npcs)
@@ -197,6 +131,16 @@ namespace Shenanijam2019
 
                     c.Dialog.Draw(spriteBatch, UI.uiFont, new Vector2(100, 600), Color.White);
                 }
+            }
+            #endregion
+
+            #region draw debug
+            if(DEBUG_MODE)
+            {
+                spriteBatch.Begin(transformMatrix: camera.TransformationMatrix, samplerState: SamplerState.PointClamp);
+                spriteBatch.Draw(Textures.pixel, new Rectangle((int)player.Position.X, (int)player.Position.Y, 2, 2), Color.Red);
+                spriteBatch.DrawString(UI.debugFont, "(" + Math.Round(player.Position.X) + ", " + Math.Round(player.Position.Y) + ")", new Vector2(player.Position.X, player.Position.Y), Color.Red);
+                spriteBatch.End();
             }
             #endregion
 

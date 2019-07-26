@@ -44,8 +44,8 @@ namespace Shenanijam2019
 
         public static void Load(ContentManager Content, GraphicsDevice graphics)
         {
-
-            Textures.pixel = new Texture2D(graphics, 1, 1);
+            pixel = new Texture2D(graphics, 1, 1);
+            pixel.SetData<Color>(new Color[] { Color.White });
 
             //player-robot
             playerMoveForward = Content.Load<Texture2D>("player_move_forward");
