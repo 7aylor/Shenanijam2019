@@ -25,12 +25,12 @@ namespace Shenanijam2019
 
         public static void Draw(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            //spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             spriteBatch.Draw(Textures.pixel, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, 64), new Color(0, 0, 0, 175));
             spriteBatch.Draw(Textures.wrenchSpin, Vector2.Zero, new Rectangle(0, 0, 32, 32), Color.White, 0, Vector2.Zero, 2, SpriteEffects.None, 0);
             spriteBatch.DrawString(uiFont, Game1.player.Wrenches.ToString(), new Vector2(56, 12), Color.White);
 
-            spriteBatch.End();
+            //spriteBatch.End();
         }
     }
 }

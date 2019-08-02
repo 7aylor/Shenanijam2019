@@ -113,15 +113,22 @@ namespace Shenanijam2019
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width / SPRITE_SCALE, GraphicsDevice.Viewport.Height / SPRITE_SCALE, 0, 0, -1);
 
             mapRender.Draw(map, camera.TransformationMatrix, projection);
-            #endregion
+            #endregion 
+
+            //Start the drawing spritebatch for all game objects here
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise,
+                transformMatrix: camera.TransformationMatrix);
 
             Characters.Draw(spriteBatch, camera);
             GameObjects.Draw(spriteBatch, camera);
             player.Draw(spriteBatch, camera, Textures.pixel);
             UI.Draw(spriteBatch, graphics);
 
+            spriteBatch.End();
+
             #region draw dialog
-            foreach(Character c in Characters.Npcs)
+            foreach (Character c in Characters.Npcs)
             {
                 if(c.Dialog.DrawDialog)
                 {

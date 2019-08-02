@@ -22,8 +22,8 @@ namespace Shenanijam2019
             Objects = new List<GameObject>();
 
             wrench = new GameObject(new Vector2(700, 700), 5, SPRITE_SCALE, "wrench", 13, 32, 10, -8);
-            vendingMachineBlue = new GameObject(new Vector2(928, 192), 5, SPRITE_SCALE, "Vending Machine", 32, 64);
-            lootBox = new GameObject(new Vector2(1184, 192), 5, SPRITE_SCALE, "Loot Box", 32, 64);
+            vendingMachineBlue = new GameObject(new Vector2(928, 192), 5, SPRITE_SCALE, "Vending Machine", 32, 32);
+            lootBox = new GameObject(new Vector2(1184, 192), 5, SPRITE_SCALE, "Loot Box", 32, 32);
 
             Objects.Add(wrench);
             Objects.Add(vendingMachineBlue);

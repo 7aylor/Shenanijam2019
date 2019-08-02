@@ -27,7 +27,9 @@ namespace Shenanijam2019
         public Animation currAnim;
         public SpriteEffects spriteEffects;
         public Direction Direction { get; set; }
-        public BoundingBox BoundingBox { get; set; }
+        public BoundingBox CollisionBox { get; set; }
+        public BoundingBox SpriteBox { get; set; }
+        public float DrawLayer { get; set; }
         internal int bXOffset;
         internal int bYOffset;
         internal int _idleTime;
@@ -44,9 +46,11 @@ namespace Shenanijam2019
             spriteEffects = SpriteEffects.None;
             this.bXOffset = (int)(bXOffset * scale);
             this.bYOffset = (int)(bYOffset * scale);
-            this.BoundingBox = new BoundingBox(new Vector2(this.Position.X + this.bXOffset, this.Position.Y - this.bYOffset) * Scale, bWidth * this.Scale, bHeight * this.Scale);
+            this.CollisionBox = new BoundingBox(new Vector2(this.Position.X + this.bXOffset, this.Position.Y - this.bYOffset) * Scale, bWidth * this.Scale, bHeight * this.Scale);
             _idleTime = 0;
+            this.SpriteBox = new BoundingBox(new Vector2(this.Position.X, this.Position.Y) * Scale, bWidth * this.Scale, bHeight * this.Scale);
             _maxIdleTime = 180;
+            DrawLayer = 0.1f;
         }
 
         public virtual void Update()
@@ -57,19 +61,19 @@ namespace Shenanijam2019
 
         public void UpdateBoundingPositions()
         {
-            BoundingBox.Position = new Vector2(this.Position.X + bXOffset, this.Position.Y - BoundingBox.Height - bYOffset);
+            CollisionBox.Position = new Vector2(this.Position.X + bXOffset, this.Position.Y - CollisionBox.Height - bYOffset);
         }
 
         public void Draw(SpriteBatch sb, Camera camera, Texture2D pixel)
         {
             if(Game1.DEBUG_MODE)
             {
-                sb.Begin(transformMatrix: camera.TransformationMatrix);
-                sb.Draw(pixel, this.BoundingBox.Bounds, Color.Red);
-                sb.End();
+                //sb.Begin(transformMatrix: camera.TransformationMatrix);
+                sb.Draw(pixel, this.CollisionBox.Bounds, Color.Red);
+                //sb.End();
             }
 
-            currAnim.Draw(sb, this.Position, this.Scale, spriteEffects, camera);
+            currAnim.Draw(sb, this.Position, this.Scale, spriteEffects, camera, DrawLayer);
         }
 
         /// <summary>
@@ -125,6 +129,7 @@ namespace Shenanijam2019
         {
             _prevKbs = Keyboard.GetState();
             this.Wrenches = 0;
+            DrawLayer = 0.1f;
         }
 
         public void Update(Camera camera, float dt, List<Obstacle> obstacles)
@@ -140,10 +145,13 @@ namespace Shenanijam2019
             _kbs = Keyboard.GetState();
             float speedModifier = 1;
 
-            BoundingBox b = this.BoundingBox;
+            BoundingBox b = this.CollisionBox;
             GameObject wrench = null;
 
             Character closestNpc = FindClosestCharacter(npcs);
+
+            UpdateSpriteLayers();
+            Debug.WriteLine("Keys pressed" + _kbs.GetPressedKeys().Length);
 
             //handles talking animation
             if(Math.Abs(Vector2.Distance(this.Position, closestNpc.Position)) < _talkDistance)
@@ -161,7 +169,7 @@ namespace Shenanijam2019
             }
 
             //handles diagonals
-            if (_kbs.GetPressedKeys().Length == 2)
+            if (_kbs.GetPressedKeys().Length >= 2)
             {
                 speedModifier *= 0.707f;
             }
@@ -175,7 +183,7 @@ namespace Shenanijam2019
                 {
                     _idleTime = 0;
 
-                    b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y - Speed * dt * speedModifier);
+                    b.Position = new Vector2(this.CollisionBox.Position.X, this.CollisionBox.Position.Y - Speed * dt * speedModifier);
 
                     wrench = CheckWrenchCollisions(gameObjects, b);
 
@@ -192,7 +200,7 @@ namespace Shenanijam2019
                 {
                     _idleTime = 0;
 
-                    b.Position = new Vector2(this.BoundingBox.Position.X, this.BoundingBox.Position.Y + Speed * dt * speedModifier);
+                    b.Position = new Vector2(this.CollisionBox.Position.X, this.CollisionBox.Position.Y + Speed * dt * speedModifier);
 
                     wrench = CheckWrenchCollisions(gameObjects, b);
 
@@ -209,7 +217,7 @@ namespace Shenanijam2019
                 {
                     _idleTime = 0;
 
-                    b.Position = new Vector2(this.BoundingBox.Position.X - Speed * dt * speedModifier, this.BoundingBox.Position.Y);
+                    b.Position = new Vector2(this.CollisionBox.Position.X - Speed * dt * speedModifier, this.CollisionBox.Position.Y);
 
                     wrench = CheckWrenchCollisions(gameObjects, b);
 
@@ -230,7 +238,7 @@ namespace Shenanijam2019
                 {
                     _idleTime = 0;
 
-                    b.Position = new Vector2(this.BoundingBox.Position.X + Speed * dt * speedModifier, this.BoundingBox.Position.Y);
+                    b.Position = new Vector2(this.CollisionBox.Position.X + Speed * dt * speedModifier, this.CollisionBox.Position.Y);
 
                     wrench = CheckWrenchCollisions(gameObjects, b);
 
@@ -294,6 +302,39 @@ namespace Shenanijam2019
         }
 
         /// <summary>
+        /// Method used to determine the sprite layer of the objects and characters.
+        /// Only change the layer if the y position is above or below the player's.
+        /// Could improve this for efficiency.
+        /// </summary>
+        private void UpdateSpriteLayers()
+        {
+            var offset = 4;
+            foreach(var gameObject in GameObjects.Objects)
+            {
+                if(this.Position.Y + offset < gameObject.Position.Y)
+                {
+                    gameObject.DrawLayer = 0.2f;
+                }
+                else
+                {
+                    gameObject.DrawLayer = 0;
+                }
+            }
+
+            foreach (var character in Characters.Npcs)
+            {
+                if (this.Position.Y + offset < character.Position.Y)
+                {
+                    character.DrawLayer = 0.2f;
+                }
+                else
+                {
+                    character.DrawLayer = 0;
+                }
+            }
+        }
+
+        /// <summary>
         /// comapares the positions of the players that are talking together and makes them face eachother
         /// </summary>
         /// <param name="pos"></param>
@@ -318,7 +359,7 @@ namespace Shenanijam2019
         {
             foreach(GameObject g in list)
             {
-                if(b.CollisionCheck(g.BoundingBox))
+                if(b.CollisionCheck(g.CollisionBox))
                 {
                     return true;
                 }
@@ -330,7 +371,7 @@ namespace Shenanijam2019
         {
             foreach (Character c in list)
             {
-                if (b.CollisionCheck(c.BoundingBox))
+                if (b.CollisionCheck(c.CollisionBox))
                 {
                     return true;
                 }
@@ -354,7 +395,7 @@ namespace Shenanijam2019
         {
             foreach (GameObject g in list)
             {
-                if (b.CollisionCheck(g.BoundingBox) && g.Name == "wrench")
+                if (b.CollisionCheck(g.CollisionBox) && g.Name == "wrench")
                 {
                     return g;
                 }
@@ -377,7 +418,7 @@ namespace Shenanijam2019
                 }
             }
 
-            Debug.WriteLine("Closet Character: " + closestChar.Name);
+            //Debug.WriteLine("Closet Character: " + closestChar.Name);
 
             return closestChar;
         }
