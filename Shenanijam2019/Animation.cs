@@ -125,5 +125,13 @@ namespace Shenanijam2019
         {
             return (_currFrame == TotalFrames) ? true : false;
         }
+
+        public void SetFrame(int frame)
+        {
+            if(frame < TotalFrames)
+            {
+                _currFrame = frame;
+            }
+        }
     }
 }

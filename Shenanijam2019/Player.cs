@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 
 namespace Shenanijam2019
 {
@@ -59,6 +60,9 @@ namespace Shenanijam2019
             currAnim.Update();
         }
 
+        /// <summary>
+        /// Updates the object's collision box based off of current position
+        /// </summary>
         public void UpdateBoundingPositions()
         {
             CollisionBox.Position = new Vector2(this.Position.X + bXOffset, this.Position.Y - CollisionBox.Height - bYOffset);
@@ -116,6 +120,11 @@ namespace Shenanijam2019
                 Dialog.Update(gameTime);
             }
         }
+
+        private void LoadCharacter(string fileName)
+        {
+            
+        }
     }
 
     public class Player : Character
@@ -137,6 +146,7 @@ namespace Shenanijam2019
             List<Character> npcs = Characters.Npcs;
             List<GameObject> gameObjects = GameObjects.Objects;
 
+            //store previous keyboard state
             if (_kbs != null)
             {
                 _prevKbs = _kbs;
@@ -145,22 +155,25 @@ namespace Shenanijam2019
             _kbs = Keyboard.GetState();
             float speedModifier = 1;
 
+            //current collision box used for collision checks
             BoundingBox b = this.CollisionBox;
+
             GameObject wrench = null;
 
             Character closestNpc = FindClosestCharacter(npcs);
 
             UpdateSpriteLayers();
-            Debug.WriteLine("Keys pressed" + _kbs.GetPressedKeys().Length);
 
-            //handles talking animation
-            if(Math.Abs(Vector2.Distance(this.Position, closestNpc.Position)) < _talkDistance)
+            float distToClosestChar = Math.Abs(Vector2.Distance(this.Position, closestNpc.Position));
+
+            //handles dialog prompt animation
+            if (distToClosestChar < _talkDistance)
             {
                 closestNpc.ShowDialogPrompt = true;
             }
 
             //controls when the player talks to an npc
-            if(_kbs.IsKeyDown(Keys.E) && !_prevKbs.IsKeyDown(Keys.E) && !closestNpc.Dialog.IsScrolling)
+            if (_kbs.IsKeyDown(Keys.E) && !_prevKbs.IsKeyDown(Keys.E) && !closestNpc.Dialog.IsScrolling)
             {
                 closestNpc.Dialog.DrawDialog = true;
                 closestNpc.Dialog.IsScrolling = true;
@@ -168,7 +181,7 @@ namespace Shenanijam2019
                 FaceTalkingNpc(closestNpc);
             }
 
-            //handles diagonals
+            //handles if a player is moving diagonally
             if (_kbs.GetPressedKeys().Length >= 2)
             {
                 speedModifier *= 0.707f;
@@ -259,12 +272,13 @@ namespace Shenanijam2019
             //Idle animations
             if (_kbs.GetPressedKeys().Length == 0)
             {
+                Debug.WriteLine("Idle");
                 SetCurrentAnimation("idle_side");
                 _idleTime++;
                 if (_idleTime > _maxIdleTime && currAnim.IsComplete())
                 {
                     //don't go to sleep if talking
-                    if(!closestNpc.Dialog.DrawDialog)
+                    if (!closestNpc.Dialog.DrawDialog)
                     {
                         spriteEffects = SpriteEffects.None;
                         if (Direction == Direction.Left)
@@ -284,21 +298,46 @@ namespace Shenanijam2019
                 }
             }
 
-            if(wrench != null)
-            {
-                gameObjects.Remove(wrench);
-                Wrenches += 10;
-            }
+            CollectWrench(gameObjects, wrench);
+            FlipSpriteIfFacingLeft();
+            UpdateCameraPosition(camera);
+            UpdateBoundingPositions();
+            currAnim.Update();
+        }
 
+        /// <summary>
+        /// flip the sprite if player is facing left
+        /// </summary>
+        private void FlipSpriteIfFacingLeft()
+        {
             if (Direction == Direction.Left)
             {
                 spriteEffects = SpriteEffects.FlipHorizontally;
             }
+        }
 
+        /// <summary>
+        /// Collect wrench if the player has passed over it
+        /// </summary>
+        /// <param name="gameObjects"></param>
+        /// <param name="wrench"></param>
+        private void CollectWrench(List<GameObject> gameObjects, GameObject wrench)
+        {
+            if (wrench != null)
+            {
+                gameObjects.Remove(wrench);
+                Wrenches += 10;
+            }
+        }
+
+        /// <summary>
+        /// Updates the camera position based off of player position, ie, it follows the player
+        /// </summary>
+        /// <param name="camera"></param>
+        private void UpdateCameraPosition(Camera camera)
+        {
             camera.X = this.Position.X - (1240 / 6) + 16;
             camera.Y = this.Position.Y - (720 / 6);
-            UpdateBoundingPositions();
-            currAnim.Update();
         }
 
         /// <summary>

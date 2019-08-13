@@ -18,6 +18,7 @@ namespace Shenanijam2019
         public static Character brownNiblix;
         public static Character purpleNiblix;
         public static Character looselyRelatedRobot;
+        public static Character burgerBot;
         const int SPRITE_SCALE = 1;
         #endregion
 
@@ -33,6 +34,7 @@ namespace Shenanijam2019
             brownNiblix = new Character(new Vector2(640, 565), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
             purpleNiblix = new Character(new Vector2(800, 900), 5, SPRITE_SCALE, "Garble", 16, 20, 6); ;
             looselyRelatedRobot = new Character(new Vector2(900, 860), 5, SPRITE_SCALE, "L.R.Y.", 16, 24, 10);
+            burgerBot = new Character(new Vector2(996, 220), 5, SPRITE_SCALE, "BRGRBOI", 16, 20, 4, 0);
             Npcs.Add(tsaMale);
             Npcs.Add(tsaFemale);
             Npcs.Add(greenGorblork);
@@ -42,6 +44,7 @@ namespace Shenanijam2019
             Npcs.Add(brownNiblix);
             Npcs.Add(purpleNiblix);
             Npcs.Add(looselyRelatedRobot);
+            Npcs.Add(burgerBot);
 
             InitDialog();
         }
@@ -78,6 +81,8 @@ namespace Shenanijam2019
             brownNiblix.SetCurrentAnimation("idle_side");
             looselyRelatedRobot.AddAnimation("idle_side", new Animation(32, 32, 8, Textures.looselyRelatedIdle));
             looselyRelatedRobot.SetCurrentAnimation("idle_side");
+            burgerBot.AddAnimation("idle_side", new Animation(26, 33, 8, Textures.burgerBot));
+            burgerBot.SetCurrentAnimation("idle_side");
 
         }
 
@@ -100,7 +105,7 @@ namespace Shenanijam2019
                 if (Npcs[i].ShowDialogPrompt)
                 {
                     hasDrawnDialogPrompt = true;
-                    UI.dialogPromptAnim.Draw(spriteBatch, Npcs[i].Position - new Vector2(6, 26), SPRITE_SCALE, SpriteEffects.None, camera);
+                    UI.dialogPromptAnim.Draw(spriteBatch, Npcs[i].Position - new Vector2(6, 26), SPRITE_SCALE, SpriteEffects.None, camera, 1);
                     Npcs[i].ShowDialogPrompt = false; //set to false so only one prompt will appear
                 }
                 //ensures a fade in on each change of character with a prompt

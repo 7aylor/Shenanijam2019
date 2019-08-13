@@ -11,7 +11,7 @@ namespace Shenanijam2019
 {
     public class Game1 : Game
     {
-        public static bool DEBUG_MODE = false;
+        public static bool DEBUG_MODE = true;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Camera camera;
@@ -54,7 +54,7 @@ namespace Shenanijam2019
             Textures.Load(this.Content, this.GraphicsDevice);
 
             #region Load Map obstacles
-            map = Content.Load<TiledMap>("spaceport");
+            map = Content.Load<TiledMap>(@"Environment\Background\spaceport");
 
             var objectLayers = map.ObjectLayers;
             foreach(var objLayer in objectLayers)
